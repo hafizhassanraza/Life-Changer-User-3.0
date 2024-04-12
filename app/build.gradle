@@ -1,0 +1,156 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id 'com.google.gms.google-services'
+}
+
+android {
+    namespace 'com.enfotrix.life_changer_user_2_0'
+    compileSdk 34
+
+
+    defaultConfig {
+
+        applicationId "com.enfotrix.life_changer_user_2_0"
+        minSdk 23
+        targetSdk 33
+        versionCode 8
+        versionName "4.4"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+    buildFeatures {
+        viewBinding true
+        buildConfig true
+    }
+    buildToolsVersion '34.0.0'
+}
+
+dependencies {
+    implementation 'com.google.android.recaptcha:recaptcha:18.4.0'
+
+    implementation'com.google.android.play:app-update-ktx:2.1.0'
+    implementation 'androidx.core:core-ktx:1.12.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.10.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.2'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.7.5'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.7.5'
+    implementation 'com.google.firebase:firebase-firestore-ktx:24.9.1'
+    implementation 'com.google.firebase:firebase-storage-ktx:20.3.0'
+    implementation 'androidx.gridlayout:gridlayout:1.0.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'com.google.firebase:firebase-auth-ktx:22.3.0'
+
+    implementation'com.google.android.play:app-update-ktx:2.1.0'
+
+    implementation 'com.android.volley:volley:1.2.1'
+
+
+
+    ///notification
+    implementation 'com.google.firebase:firebase-messaging-ktx:23.3.1'
+    implementation 'com.google.firebase:firebase-messaging:23.3.1'
+    implementation 'androidx.activity:activity:1.8.0'
+    ///
+
+
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+
+
+    // In app update
+    implementation("com.google.android.play:app-update:2.1.0")
+    implementation("com.google.android.play:app-update-ktx:2.1.0")
+
+
+    implementation 'com.github.bumptech.glide:glide:4.15.0' // Replace with the latest version
+
+    implementation 'androidx.fragment:fragment-ktx:1.6.2'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2'
+
+
+    //Retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.9.0'
+
+    //Glide
+    implementation 'com.github.bumptech.glide:glide:4.15.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.15.0'
+
+    //Coroutines
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
+
+    //Coroutines LifeCycle Scopes
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.2'
+
+    // Navigation Component
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.7.5'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.7.5'
+
+    // Room components
+    implementation "androidx.room:room-runtime:2.6.0"
+    implementation "androidx.room:room-ktx:2.6.0"
+    androidTestImplementation "androidx.room:room-testing:2.6.0"
+
+    // Lifecycle components
+    implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
+    implementation "androidx.lifecycle:lifecycle-common-java8:2.6.2"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2"
+
+    // Kotlin components
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.0"
+    api "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
+    api "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4"
+
+    //hilt depedency
+    implementation("com.google.dagger:hilt-android:2.44")
+
+
+    //circular Image View
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
+
+    //pdf download
+    implementation 'com.itextpdf:itextpdf:5.5.13.2'
+
+    //lottie animation
+    implementation 'com.airbnb.android:lottie:4.2.2'
+
+    //splash api
+    implementation("androidx.core:core-splashscreen:1.0.1")
+
+    //lottie animation
+    implementation "com.airbnb.android:lottie:4.2.2"
+    //country code picker
+    implementation 'com.hbb20:ccp:2.6.1'
+
+    implementation platform('com.google.firebase:firebase-bom:28.4.1')
+    implementation 'com.google.firebase:firebase-auth-ktx'
+
+    //to download pdf file
+
+    implementation 'com.itextpdf:itext7-core:7.2.1'
+
+
+
+}
