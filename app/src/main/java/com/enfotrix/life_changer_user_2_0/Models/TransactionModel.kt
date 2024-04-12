@@ -17,4 +17,5 @@ data class TransactionModel @JvmOverloads constructor(
     var transactionAt: Timestamp? = null, // Creation timestamp
     val createdAt: Timestamp = Timestamp.now() // Creation timestamp
 
+
 )

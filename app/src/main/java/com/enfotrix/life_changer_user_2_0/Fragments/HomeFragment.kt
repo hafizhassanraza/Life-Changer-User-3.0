@@ -225,7 +225,10 @@ class HomeFragment : Fragment() {
 
 
                             val gson = Gson()
-                            val user: ModelUser = gson.fromJson(response.toString(), ModelUser::class.java)
+
+                            val user: ModelUser = gson.fromJson(jsonObject.getJSONObject("data").toString(), ModelUser::class.java)
+
+                            Toast.makeText(mContext, user.toString(), Toast.LENGTH_SHORT).show()
                             sharedPrefManager.setLoginStatus(user.status)
                             sharedPrefManager.saveUser(user)
 
