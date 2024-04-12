@@ -44,7 +44,7 @@ class ActivitySplash : AppCompatActivity() {
 
             when {
                 sharedPrefManager.getStatus() == constants.INVESTOR_STATUS_ACTIVE ||
-                        sharedPrefManager.getUser().status == constants.INVESTOR_STATUS_PENDING -> {
+                        sharedPrefManager.getUser()!!.status == constants.INVESTOR_STATUS_PENDING  -> {
                     startActivity(Intent(mContext, MainActivity::class.java))
                     finish()
                 }

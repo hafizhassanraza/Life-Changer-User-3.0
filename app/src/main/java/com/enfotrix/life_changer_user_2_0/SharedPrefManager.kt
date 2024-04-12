@@ -383,7 +383,7 @@ class SharedPrefManager(context: Context) {
 
     fun getUser(): ModelUser {
         val json = sharedPref.getString("Investor", "") ?: ""
-        return Gson().fromJson(json, ModelUser::class.java)
+        return Gson().fromJson(json!!, ModelUser::class.java)
         /*return User(
             sharedPref.getString("cnic", "")!!,
             sharedPref.getString("firstName", "")!!,
