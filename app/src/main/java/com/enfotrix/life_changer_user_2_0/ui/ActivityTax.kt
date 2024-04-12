@@ -14,6 +14,7 @@ import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.enfotrix.life_changer_user_2_0.Adapters.StatmentAdapter
+import com.enfotrix.life_changer_user_2_0.Adapters.TransactionsAdapter
 import com.enfotrix.life_changer_user_2_0.Constants
 import com.enfotrix.life_changer_user_2_0.Models.InvestmentViewModel
 import com.enfotrix.life_changer_user_2_0.Models.TransactionModel
@@ -106,14 +107,12 @@ class ActivityTax : AppCompatActivity() {
                                 object : TypeToken<List<TransactionModel>>() {}.type
                             )
 
-                            if (transactions.isNotEmpty()) {
 
 
-                                binding.rvTax.adapter= StatmentAdapter(transactions)
+                            binding.rvTax.adapter= TransactionsAdapter(constants.FROM_PROFIT,transactions)
 
-                            } else {
-                                Toast.makeText(mContext, "No Data Found", Toast.LENGTH_SHORT).show()
-                            }
+
+
 
 
 
@@ -172,6 +171,7 @@ class ActivityTax : AppCompatActivity() {
 
 
     }
+
 
 
     private fun generatePDF() {
