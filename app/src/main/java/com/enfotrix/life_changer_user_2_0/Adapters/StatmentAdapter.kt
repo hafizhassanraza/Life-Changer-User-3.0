@@ -16,6 +16,8 @@ class StatmentAdapter (val data: List<TransactionModel>) : RecyclerView.Adapter<
 
     var constant= Constants()
 
+
+
     interface OnItemClickListener {
         fun onItemClick(transactionModel: TransactionModel)
         fun onDeleteClick(transactionModel: TransactionModel)
@@ -29,11 +31,10 @@ class StatmentAdapter (val data: List<TransactionModel>) : RecyclerView.Adapter<
 
         fun bind(transactionModel: TransactionModel) {
 
-            val dateFormat = SimpleDateFormat("dd/MM/yy", Locale.getDefault())
-            val formattedDate = transactionModel.transactionAt?.toDate()?.let { dateFormat.format(it) }
-            itemBinding.tvReqDate.text = SimpleDateFormat("dd/MM/yy", Locale.getDefault()).format(transactionModel.createdAt.toDate())
-            itemBinding.tvPreviousBalance.text = transactionModel.previousBalance
-            itemBinding.tvNewBalance.text = transactionModel.newBalance
+
+            itemBinding.tvReqDate.text = transactionModel.created_at
+            itemBinding.tvPreviousBalance.text = transactionModel.previous_balance.toString()
+            itemBinding.tvNewBalance.text = transactionModel.new_balance.toString()
 
             when(transactionModel.type){
 
@@ -51,11 +52,11 @@ class StatmentAdapter (val data: List<TransactionModel>) : RecyclerView.Adapter<
                 }
                 constant.TRANSACTION_TYPE_INVESTMENT -> {
                     itemBinding.transactionType.text = "Invest"
-                    itemBinding.tvReqAmount.text = transactionModel.amount
+                    itemBinding.tvReqAmount.text = transactionModel.amount.toString()
                 }
                 constant.TRANSACTION_TYPE_PROFIT -> {
                     itemBinding.transactionType.text = "Profit"
-                    itemBinding.tvReqAmount.text = transactionModel.amount
+                    itemBinding.tvReqAmount.text = transactionModel.amount.toString()
                 }
 
 

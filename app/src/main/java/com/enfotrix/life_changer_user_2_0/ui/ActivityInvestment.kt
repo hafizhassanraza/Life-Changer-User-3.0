@@ -5,19 +5,31 @@ import android.icu.text.SimpleDateFormat
 import android.icu.util.Calendar
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.android.volley.Request
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
+import com.enfotrix.life_changer_user_2_0.Adapters.StatmentAdapter
+import com.enfotrix.life_changer_user_2_0.Adapters.TransactionsAdapter
 import com.enfotrix.life_changer_user_2_0.Constants
 import com.enfotrix.life_changer_user_2_0.Models.InvestmentViewModel
+import com.enfotrix.life_changer_user_2_0.Models.TransactionModel
 import com.enfotrix.life_changer_user_2_0.R
 import com.enfotrix.life_changer_user_2_0.SharedPrefManager
 import com.enfotrix.life_changer_user_2_0.Utils
 import com.enfotrix.life_changer_user_2_0.databinding.ActivityInvestmentBinding
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import org.json.JSONException
+import org.json.JSONObject
 import java.util.Locale
 
 
@@ -115,6 +127,7 @@ class ActivityInvestment : AppCompatActivity() {
             R.layout.item_investment_selection_spiner // Use the custom layout
         )
 
+
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
         spinner.adapter = adapter
@@ -128,10 +141,14 @@ class ActivityInvestment : AppCompatActivity() {
                 // Check the index and show a different message for 1st and 2nd index
                 when (position) {
                     0 -> {
-                        binding.rvInvestments.adapter= investmentViewModel.getApprovedInvestmentReqAdapter(constants.FROM_APPROVED_INVESTMENT_REQ)
+                        getTransaction( "Investment", "Approved" )
+
+                        //binding.rvInvestments.adapter= investmentViewModel.getApprovedInvestmentReqAdapter(constants.FROM_APPROVED_INVESTMENT_REQ)
                     }
                     1 -> {
-                        binding.rvInvestments.adapter= investmentViewModel.getPendingInvestmentReqAdapter(constants.FROM_PENDING_INVESTMENT_REQ)
+                        getTransaction( "Investment", "Pending" )
+
+                        //binding.rvInvestments.adapter= investmentViewModel.getPendingInvestmentReqAdapter(constants.FROM_PENDING_INVESTMENT_REQ)
                     }
                 }
 
@@ -150,87 +167,99 @@ class ActivityInvestment : AppCompatActivity() {
 
 
 
-/*
 
-    @RequiresApi(Build.VERSION_CODES.N)
-    private fun showDatePickerDialog(isStartDate: Boolean) {
-        val calendar = if (isStartDate) startCalendar else endCalendar
-        val currentYear = calendar.get(Calendar.YEAR)
-        val currentMonth = calendar.get(Calendar.MONTH)
-        val currentDay = calendar.get(Calendar.DAY_OF_MONTH)
+    private fun getTransaction( type:String,status:String ) {
 
-        DatePickerDialog(
-            this,
-            { _: DatePicker, year: Int, monthOfYear: Int, dayOfMonth: Int ->
-                calendar.set(year, monthOfYear, dayOfMonth)
-                updateButtonText(isStartDate)
-            },
-            currentYear,
-            currentMonth,
-            currentDay
-        ).show()
-    }
-
-    @RequiresApi(Build.VERSION_CODES.N)
-    private fun updateButtonText(isStartDate: Boolean) {
-        val calendar = if (isStartDate) startCalendar else endCalendar
-        val selectedDate = dateFormat.format(calendar.time)
-
-        if (isStartDate) {
-            binding.startDate.text = selectedDate
-            startFormattedDate = selectedDate
-        } else {
-            binding.endDate.text = selectedDate
-            endFormattedDate = selectedDate
-        }
-        Toast.makeText(mContext, ""+startCalendar, Toast.LENGTH_SHORT).show()
-    }
-
-    private fun setupTabLayout() {
-        TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
-            if(position==0) tab.text ="Approved"
-            else if(position==1) tab.text="Pending"
-        }.attach()
-    }
-
-    private fun setupViewPager() {
-                  val adapter = InvestmentViewPagerAdapter(this, 2)
-        binding.viewPager.adapter = adapter
-    }
-
-    private fun getDataByDate(startTimestamp:Timestamp, endTimestamp:Timestamp){
-
-                                  Toast.makeText(mContext, ""+startTimestamp, Toast.LENGTH_SHORT).show()
-                                  Toast.makeText(mContext, ""+endTimestamp, Toast.LENGTH_SHORT).show()
 
         utils.startLoadingAnimation()
-        lifecycleScope.launch{
-            investmentViewModel.getInvestmentReqByDates(sharedPrefManager.getToken(), startTimestamp, endTimestamp)
-                .addOnCompleteListener{task ->
-                    utils.endLoadingAnimation()
-                    if (task.isSuccessful) {
-                        val list = ArrayList<TransactionModel>()
-                        if(task.result.size()>0){
-                            for (document in task.result) list.add( document.toObject(TransactionModel::class.java))
-                            Toast.makeText(mContext, "List size"+list.size, Toast.LENGTH_SHORT).show()
-                            sharedPrefManager.putInvestmentReqList(list)
+        val url = "http://192.168.0.103:8000/api/all-transaction"
 
-                            setupViewPager()
-                            setupTabLayout()
+        val stringRequest = object : StringRequest(
+            Request.Method.POST, url,
+            com.android.volley.Response.Listener { response ->
+                // Handle the response
+                utils.endLoadingAnimation()
+
+                try {
+
+                    val jsonObject = JSONObject(response)
+
+                    if (jsonObject != null) {
+
+                        if (jsonObject.getBoolean("success") == true) {
+
+
+                            val gson = Gson()
+                            val transactions: List<TransactionModel> = gson.fromJson(
+                                jsonObject.getJSONArray("data").toString(),
+                                object : TypeToken<List<TransactionModel>>() {}.type
+                            )
+
+
+
+
+                            if(type.equals("Approved")) binding.rvInvestments.adapter= TransactionsAdapter(constants.FROM_APPROVED_INVESTMENT_REQ,transactions)
+                            if(type.equals("Pending")) binding.rvInvestments.adapter= TransactionsAdapter(constants.FROM_PENDING_INVESTMENT_REQ,transactions)
+
+
+
+
+
+
+
+                        } else if (jsonObject.getBoolean("success") == false) {
+
+                            var error = jsonObject.getString("message")
+                            Toast.makeText(mContext, " ${error}", Toast.LENGTH_SHORT).show()
                         }
+
                     }
-                    else Toast.makeText(mContext, constants.SOMETHING_WENT_WRONG_MESSAGE, Toast.LENGTH_SHORT).show()
 
 
-
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                    Toast.makeText(mContext, e.message.toString(), Toast.LENGTH_SHORT).show()
+                    // Handle JSON parsing error
                 }
-                .addOnFailureListener{
-                    utils.endLoadingAnimation()
-                    Toast.makeText(mContext, it.message+"", Toast.LENGTH_SHORT).show()
 
-                }
+
+            },
+            com.android.volley.Response.ErrorListener { error ->
+                // Handle errors
+                utils.endLoadingAnimation()
+                Toast.makeText(mContext, "Response: ${error.message}", Toast.LENGTH_SHORT).show()
+
+                Log.e("VolleyError", "Error: $error")
+            }) {
+
+
+            override fun getParams(): MutableMap<String, String> {
+
+                val params = HashMap<String, String>()
+
+
+                params["type"] = type
+                params["status"] = status
+
+                return params
+            }
+
+            override fun getHeaders(): MutableMap<String, String> {
+                val headers = HashMap<String, String>()
+                headers["Authorization"] =
+                    "Bearer ${sharedPrefManager.getToken()}" // Replace "token" with your actual token
+                return headers
+            }
+
 
         }
+
+
+        Volley.newRequestQueue(mContext).add(stringRequest)
+
+
+
+
     }
 
 
@@ -238,20 +267,108 @@ class ActivityInvestment : AppCompatActivity() {
 
 
 
+    /*
 
+        @RequiresApi(Build.VERSION_CODES.N)
+        private fun showDatePickerDialog(isStartDate: Boolean) {
+            val calendar = if (isStartDate) startCalendar else endCalendar
+            val currentYear = calendar.get(Calendar.YEAR)
+            val currentMonth = calendar.get(Calendar.MONTH)
+            val currentDay = calendar.get(Calendar.DAY_OF_MONTH)
 
-    override fun onBackPressed() {
-        val viewPager = binding.viewPager
-        if (viewPager.currentItem == 0) {
-            // If the user is currently looking at the first step, allow the system to handle the
-            // Back button. This calls finish() on this activity and pops the back stack.
-            super.onBackPressed()
-        } else {
-            // Otherwise, select the previous step.
-            viewPager.currentItem = viewPager.currentItem - 1
+            DatePickerDialog(
+                this,
+                { _: DatePicker, year: Int, monthOfYear: Int, dayOfMonth: Int ->
+                    calendar.set(year, monthOfYear, dayOfMonth)
+                    updateButtonText(isStartDate)
+                },
+                currentYear,
+                currentMonth,
+                currentDay
+            ).show()
         }
-    }
-*/
+
+        @RequiresApi(Build.VERSION_CODES.N)
+        private fun updateButtonText(isStartDate: Boolean) {
+            val calendar = if (isStartDate) startCalendar else endCalendar
+            val selectedDate = dateFormat.format(calendar.time)
+
+            if (isStartDate) {
+                binding.startDate.text = selectedDate
+                startFormattedDate = selectedDate
+            } else {
+                binding.endDate.text = selectedDate
+                endFormattedDate = selectedDate
+            }
+            Toast.makeText(mContext, ""+startCalendar, Toast.LENGTH_SHORT).show()
+        }
+
+        private fun setupTabLayout() {
+            TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
+                if(position==0) tab.text ="Approved"
+                else if(position==1) tab.text="Pending"
+            }.attach()
+        }
+
+        private fun setupViewPager() {
+                      val adapter = InvestmentViewPagerAdapter(this, 2)
+            binding.viewPager.adapter = adapter
+        }
+
+        private fun getDataByDate(startTimestamp:Timestamp, endTimestamp:Timestamp){
+
+                                      Toast.makeText(mContext, ""+startTimestamp, Toast.LENGTH_SHORT).show()
+                                      Toast.makeText(mContext, ""+endTimestamp, Toast.LENGTH_SHORT).show()
+
+            utils.startLoadingAnimation()
+            lifecycleScope.launch{
+                investmentViewModel.getInvestmentReqByDates(sharedPrefManager.getToken(), startTimestamp, endTimestamp)
+                    .addOnCompleteListener{task ->
+                        utils.endLoadingAnimation()
+                        if (task.isSuccessful) {
+                            val list = ArrayList<TransactionModel>()
+                            if(task.result.size()>0){
+                                for (document in task.result) list.add( document.toObject(TransactionModel::class.java))
+                                Toast.makeText(mContext, "List size"+list.size, Toast.LENGTH_SHORT).show()
+                                sharedPrefManager.putInvestmentReqList(list)
+
+                                setupViewPager()
+                                setupTabLayout()
+                            }
+                        }
+                        else Toast.makeText(mContext, constants.SOMETHING_WENT_WRONG_MESSAGE, Toast.LENGTH_SHORT).show()
+
+
+
+                    }
+                    .addOnFailureListener{
+                        utils.endLoadingAnimation()
+                        Toast.makeText(mContext, it.message+"", Toast.LENGTH_SHORT).show()
+
+                    }
+
+            }
+        }
+
+
+
+
+
+
+
+
+        override fun onBackPressed() {
+            val viewPager = binding.viewPager
+            if (viewPager.currentItem == 0) {
+                // If the user is currently looking at the first step, allow the system to handle the
+                // Back button. This calls finish() on this activity and pops the back stack.
+                super.onBackPressed()
+            } else {
+                // Otherwise, select the previous step.
+                viewPager.currentItem = viewPager.currentItem - 1
+            }
+        }
+    */
 
 
 

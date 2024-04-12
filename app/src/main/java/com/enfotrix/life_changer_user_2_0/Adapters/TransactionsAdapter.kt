@@ -30,11 +30,9 @@ class TransactionsAdapter (var activity:String, val data: List<TransactionModel>
         fun bind(transactionModel: TransactionModel) {
 
 
-            val dateFormat = SimpleDateFormat("dd/MM/yy", Locale.getDefault())
-            val formattedDate = transactionModel.transactionAt?.toDate()?.let { dateFormat.format(it) }
 
-            itemBinding.tvReqDate.text = SimpleDateFormat("dd/MM/yy", Locale.getDefault()).format(transactionModel.createdAt.toDate())
-            itemBinding.tvPreviousBalance.text = transactionModel.previousBalance
+            itemBinding.tvReqDate.text = transactionModel.created_at
+            itemBinding.tvPreviousBalance.text = transactionModel.previous_balance.toString()
 
             when (activity) {
                 constant.FROM_PENDING_WITHDRAW_REQ -> {
@@ -46,8 +44,7 @@ class TransactionsAdapter (var activity:String, val data: List<TransactionModel>
                     itemBinding.tvReqAmount.setTextColor(Color.RED)
                 }
                 constant.FROM_APPROVED_WITHDRAW_REQ, constant.FROM_APPROVED_INVESTMENT_REQ, constant.FROM_PROFIT, constant.FROM_TAX -> {
-                    itemBinding.tvPreviousBalance.text = transactionModel.previousBalance
-                    //itemBinding.tvNewBalance.text = transactionModel.newBalance
+                    itemBinding.tvPreviousBalance.text = transactionModel.previous_balance.toString()
 
 
 
@@ -60,7 +57,7 @@ class TransactionsAdapter (var activity:String, val data: List<TransactionModel>
 
                     if (activity == constant.FROM_APPROVED_WITHDRAW_REQ || activity == constant.FROM_APPROVED_INVESTMENT_REQ ) {
 
-                         itemBinding.tvApprovedDate.text = formattedDate
+                         itemBinding.tvApprovedDate.text = transactionModel.updated_at
                      }
 
                     if (activity == constant.FROM_TAX || activity == constant.FROM_APPROVED_WITHDRAW_REQ) {
@@ -69,130 +66,21 @@ class TransactionsAdapter (var activity:String, val data: List<TransactionModel>
                          itemBinding.tvReqAmount.setTextColor(Color.RED)
 
                     } else{
-                         itemBinding.tvReqAmount.text =transactionModel.amount
+                         itemBinding.tvReqAmount.text =transactionModel.amount.toString()
                          itemBinding.tvReqAmount.setTextColor(0xFF2F9B47.toInt())
                      }
-                    //itemBinding.tvNewBalance.setTextColor(0xFF2F9B47.toInt())
-                    //itemBinding.tvReqAmount.setTextColor(if (activity == constant.FROM_TAX) Color.RED else 0xFF2F9B47.toInt())
+                    itemBinding.tvReqAmount.setTextColor(if (activity == constant.FROM_TAX) Color.RED else 0xFF2F9B47.toInt())
                 }
                 constant.FROM_PENDING_INVESTMENT_REQ -> {
                     itemBinding.tvApprovedDate.text = constant.TRANSACTION_STATUS_PENDING
-                    //itemBinding.tvNewBalance.text = constant.TRANSACTION_STATUS_PENDING
-                    itemBinding.tvReqAmount.text = transactionModel.amount
-                    itemBinding.tvPreviousBalance.text = transactionModel.previousBalance
+                    itemBinding.tvReqAmount.text = transactionModel.amount.toString()
+                    itemBinding.tvPreviousBalance.text = transactionModel.previous_balance.toString()
                     itemBinding.tvApprovedDate.setTextColor(Color.RED)
-                    //itemBinding.tvNewBalance.setTextColor(Color.RED)
                     itemBinding.tvReqAmount.setTextColor(0xFF2F9B47.toInt())
                 }
             }
 
 
-            /*itemBinding.tvReqDate.text=SimpleDateFormat("dd/MM/yy", Locale.getDefault()).format(transactionModel.createdAt.toDate()).toString()
-            itemBinding.tvPreviousBalance.text=transactionModel.previousBalance
-
-
-            if(activity.equals(constant.FROM_PENDING_WITHDRAW_REQ)){
-
-                itemBinding.tvApprovedDate.text=constant.TRANSACTION_STATUS_PENDING
-                itemBinding.tvNewBalance.text=constant.TRANSACTION_STATUS_PENDING
-                itemBinding.tvReqAmount.text="-"+transactionModel.amount
-                itemBinding.tvPreviousBalance.text=transactionModel.previousBalance
-
-                itemBinding.tvApprovedDate.setTextColor(Color.RED)
-                itemBinding.tvNewBalance.setTextColor(Color.RED)
-                itemBinding.tvReqAmount.setTextColor(Color.RED)
-
-            }
-            else if(activity.equals(constant.FROM_APPROVED_WITHDRAW_REQ)){
-
-                itemBinding.tvApprovedDate.text==SimpleDateFormat("dd/MM/yy", Locale.getDefault()).format(transactionModel.transactionAt!!.toDate()).toString()
-
-                val dateFormat = SimpleDateFormat("dd/MM/yy", Locale.getDefault())
-                if(transactionModel.transactionAt!=null){
-                    val formattedDate = dateFormat.format(transactionModel.transactionAt!!.toDate())
-                    itemBinding.tvApprovedDate.text = formattedDate
-                }
-                itemBinding.tvPreviousBalance.text=transactionModel.previousBalance
-
-                itemBinding.tvNewBalance.text=transactionModel.newBalance
-                itemBinding.tvReqAmount.text="-"+transactionModel.amount
-                itemBinding.tvNewBalance.setTextColor(0xFF2F9B47.toInt())
-                itemBinding.tvReqAmount.setTextColor(Color.RED)
-
-            }
-            else if(activity.equals(constant.FROM_PENDING_INVESTMENT_REQ)){
-
-
-                itemBinding.tvApprovedDate.text=constant.TRANSACTION_STATUS_PENDING
-                itemBinding.tvNewBalance.text=constant.TRANSACTION_STATUS_PENDING
-                itemBinding.tvReqAmount.text=transactionModel.amount
-                itemBinding.tvPreviousBalance.text=transactionModel.previousBalance
-
-                itemBinding.tvApprovedDate.setTextColor(Color.RED)
-                itemBinding.tvNewBalance.setTextColor(Color.RED)
-                itemBinding.tvReqAmount.setTextColor(0xFF2F9B47.toInt())
-
-            }
-            else if(activity.equals(constant.FROM_APPROVED_INVESTMENT_REQ)){
-
-                if(transactionModel.transactionAt!=null) itemBinding.tvApprovedDate.text==SimpleDateFormat("dd/MM/yy", Locale.getDefault()).format(transactionModel.transactionAt!!.toDate()).toString()
-
-//                itemBinding.tvApprovedDate.text==SimpleDateFormat("dd/MM/yy",
-                //                Locale.getDefault()).format(transactionModel.transactionAt!!.toDate()).toString()
-
-                val dateFormat = SimpleDateFormat("dd/MM/yy", Locale.getDefault())
-                if(transactionModel.transactionAt!=null){
-                    val formattedDate = dateFormat.format(transactionModel.transactionAt!!.toDate())
-                    itemBinding.tvApprovedDate.text = formattedDate
-                }
-                itemBinding.tvPreviousBalance.text=transactionModel.previousBalance
-
-                itemBinding.tvNewBalance.text=transactionModel.newBalance
-                itemBinding.tvReqAmount.text=transactionModel.amount
-                itemBinding.tvNewBalance.setTextColor(0xFF2F9B47.toInt())
-                itemBinding.tvReqAmount.setTextColor(0xFF2F9B47.toInt())
-
-            }
-            else if(activity.equals(constant.FROM_PROFIT)){
-
-                if(transactionModel.transactionAt!=null) itemBinding.tvApprovedDate.text==SimpleDateFormat("dd/MM/yy", Locale.getDefault()).format(transactionModel.transactionAt!!.toDate()).toString()
-
-//                itemBinding.tvApprovedDate.text==SimpleDateFormat("dd/MM/yy",
-                //                Locale.getDefault()).format(transactionModel.transactionAt!!.toDate()).toString()
-
-                val dateFormat = SimpleDateFormat("dd/MM/yy", Locale.getDefault())
-                if(transactionModel.transactionAt!=null){
-                    val formattedDate = dateFormat.format(transactionModel.transactionAt!!.toDate())
-                    itemBinding.tvApprovedDate.text = formattedDate
-                }
-                itemBinding.tvPreviousBalance.text=transactionModel.previousBalance
-
-                itemBinding.tvNewBalance.text=transactionModel.newBalance
-                itemBinding.tvReqAmount.text=transactionModel.amount
-                itemBinding.tvNewBalance.setTextColor(0xFF2F9B47.toInt())
-                itemBinding.tvReqAmount.setTextColor(0xFF2F9B47.toInt())
-
-            }
-            else if(activity.equals(constant.FROM_TAX)){
-
-                if(transactionModel.transactionAt!=null) itemBinding.tvApprovedDate.text==SimpleDateFormat("dd/MM/yy", Locale.getDefault()).format(transactionModel.transactionAt!!.toDate()).toString()
-
-//                itemBinding.tvApprovedDate.text==SimpleDateFormat("dd/MM/yy",
-                //                Locale.getDefault()).format(transactionModel.transactionAt!!.toDate()).toString()
-
-                val dateFormat = SimpleDateFormat("dd/MM/yy", Locale.getDefault())
-                if(transactionModel.transactionAt!=null){
-                    val formattedDate = dateFormat.format(transactionModel.transactionAt!!.toDate())
-                    itemBinding.tvApprovedDate.text = formattedDate
-                }
-                itemBinding.tvPreviousBalance.text=transactionModel.previousBalance
-
-                itemBinding.tvNewBalance.text=transactionModel.newBalance
-                itemBinding.tvReqAmount.text="-"+transactionModel.amount
-                itemBinding.tvNewBalance.setTextColor(0xFF2F9B47.toInt())
-                itemBinding.tvReqAmount.setTextColor(Color.RED)
-
-            }*/
 
 
 

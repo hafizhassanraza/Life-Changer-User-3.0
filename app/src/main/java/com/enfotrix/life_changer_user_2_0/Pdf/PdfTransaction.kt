@@ -48,17 +48,10 @@ class PdfTransaction(var List: List<TransactionModel>) {
                 table.addCell(cell)
             }
             for (item in List) {
-                val rdate = SimpleDateFormat(
-                    "dd/MM/yy",
-                    Locale.getDefault()
-                ).format(item.createdAt.toDate())
-                val cdate = item.transactionAt?.toDate()
-                    ?.let { SimpleDateFormat("dd/MM/yy", Locale.getDefault()).format(it) }
-                table.addCell(rdate)
-                table.addCell(item.previousBalance)
-                table.addCell(item.amount)
-                table.addCell(item.newBalance)
-                table.addCell(cdate)
+
+                table.addCell(item.previous_balance.toString())
+                table.addCell(item.amount.toString())
+                table.addCell(item.new_balance.toString())
             }
             document.add(table)
             document.close()

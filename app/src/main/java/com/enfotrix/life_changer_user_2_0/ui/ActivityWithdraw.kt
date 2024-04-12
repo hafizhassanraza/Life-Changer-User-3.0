@@ -5,19 +5,31 @@ import android.icu.text.SimpleDateFormat
 import android.icu.util.Calendar
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.android.volley.Request
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
+import com.enfotrix.life_changer_user_2_0.Adapters.StatmentAdapter
+import com.enfotrix.life_changer_user_2_0.Adapters.TransactionsAdapter
 import com.enfotrix.life_changer_user_2_0.Constants
 import com.enfotrix.life_changer_user_2_0.Models.InvestmentViewModel
+import com.enfotrix.life_changer_user_2_0.Models.TransactionModel
 import com.enfotrix.life_changer_user_2_0.R
 import com.enfotrix.life_changer_user_2_0.SharedPrefManager
 import com.enfotrix.life_changer_user_2_0.Utils
 import com.enfotrix.life_changer_user_2_0.databinding.ActivityWithdrawBinding
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import org.json.JSONException
+import org.json.JSONObject
 import java.util.Locale
 
 class ActivityWithdraw : AppCompatActivity() {
@@ -76,10 +88,14 @@ class ActivityWithdraw : AppCompatActivity() {
                 // Check the index and show a different message for 1st and 2nd index
                 when (position) {
                     0 -> {
-                        binding.rvWithdraws.adapter= investmentViewModel.getApprovedWithdrawReqAdapter(constants.FROM_APPROVED_WITHDRAW_REQ)
+                        getTransaction( "Withdraw", "Approved" )
+
+                        //binding.rvInvestments.adapter= investmentViewModel.getApprovedInvestmentReqAdapter(constants.FROM_APPROVED_INVESTMENT_REQ)
                     }
                     1 -> {
-                        binding.rvWithdraws.adapter= investmentViewModel.getPendingWithdrawReqAdapter(constants.FROM_PENDING_WITHDRAW_REQ)
+                        getTransaction( "Withdraw  ", "Pending" )
+
+                        //binding.rvInvestments.adapter= investmentViewModel.getPendingInvestmentReqAdapter(constants.FROM_PENDING_INVESTMENT_REQ)
                     }
                 }
 
@@ -97,66 +113,101 @@ class ActivityWithdraw : AppCompatActivity() {
 
     }
 
- /*   private fun setupTabLayout() {
-        TabLayoutMediator(
-            binding.tabLayout, binding.viewPager
-        ) { tab,
-            position ->
-            if(position==0) tab.text ="Approved"
-            else if(position==1) tab.text="Pending" }.attach()
-    }
+    private fun getTransaction( type:String,status:String ) {
 
-    private fun setupViewPager() {
-        val adapter = WithdrawViewPagerAdapter(this, 2)
-        binding.viewPager.adapter = adapter
-    }
 
-    private fun getData(){
         utils.startLoadingAnimation()
-        lifecycleScope.launch{
-            investmentViewModel.getWithdrawsReq(sharedPrefManager.getToken())
-                .addOnCompleteListener{task ->
-                    utils.endLoadingAnimation()
-                    if (task.isSuccessful) {
+        val url = "http://192.168.0.103:8000/api/all-transaction"
 
-                        val list = ArrayList<TransactionModel>()
-                        if(task.result.size()>0){
+        val stringRequest = object : StringRequest(
+            Request.Method.POST, url,
+            com.android.volley.Response.Listener { response ->
+                // Handle the response
+                utils.endLoadingAnimation()
 
-                            for (document in task.result) list.add( document.toObject(TransactionModel::class.java))
-                            sharedPrefManager.putWithdrawReqList(list)
-                            setupViewPager()
-                            setupTabLayout()
+                try {
+
+                    val jsonObject = JSONObject(response)
+
+                    if (jsonObject != null) {
+
+                        if (jsonObject.getBoolean("success") == true) {
+
+
+                            val gson = Gson()
+                            val transactions: List<TransactionModel> = gson.fromJson(
+                                jsonObject.getJSONArray("data").toString(),
+                                object : TypeToken<List<TransactionModel>>() {}.type
+                            )
 
 
 
+                            Toast.makeText(mContext, "${transactions.size}", Toast.LENGTH_SHORT).show()
+
+                            if(type.equals("Approved")) binding.rvWithdraws.adapter= TransactionsAdapter(constants.FROM_APPROVED_WITHDRAW_REQ,transactions)
+                            if(type.equals("Pending")) binding.rvWithdraws.adapter= TransactionsAdapter(constants.FROM_PENDING_WITHDRAW_REQ,transactions)
+
+
+
+
+
+
+
+                        } else if (jsonObject.getBoolean("success") == false) {
+
+                            var error = jsonObject.getString("message")
+                            Toast.makeText(mContext, " ${error}", Toast.LENGTH_SHORT).show()
                         }
+
                     }
-                    else Toast.makeText(mContext, constants.SOMETHING_WENT_WRONG_MESSAGE, Toast.LENGTH_SHORT).show()
 
 
-
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                    Toast.makeText(mContext, e.message.toString(), Toast.LENGTH_SHORT).show()
+                    // Handle JSON parsing error
                 }
-                .addOnFailureListener{
-                    utils.endLoadingAnimation()
-                    Toast.makeText(mContext, it.message+"", Toast.LENGTH_SHORT).show()
 
-                }
+
+            },
+            com.android.volley.Response.ErrorListener { error ->
+                // Handle errors
+                utils.endLoadingAnimation()
+                Toast.makeText(mContext, "Response: ${error.message}", Toast.LENGTH_SHORT).show()
+
+                Log.e("VolleyError", "Error: $error")
+            }) {
+
+
+            override fun getParams(): MutableMap<String, String> {
+
+                val params = HashMap<String, String>()
+
+
+                params["type"] = type
+                params["status"] = status
+
+                return params
+            }
+
+            override fun getHeaders(): MutableMap<String, String> {
+                val headers = HashMap<String, String>()
+                headers["Authorization"] =
+                    "Bearer ${sharedPrefManager.getToken()}" // Replace "token" with your actual token
+                return headers
+            }
+
 
         }
+
+
+        Volley.newRequestQueue(mContext).add(stringRequest)
+
+
+
+
     }
 
 
-
-    override fun onBackPressed() {
-        val viewPager = binding.viewPager
-        if (viewPager.currentItem == 0) {
-            // If the user is currently looking at the first step, allow the system to handle the
-            // Back button. This calls finish() on this activity and pops the back stack.
-            super.onBackPressed()
-        } else {
-            // Otherwise, select the previous step.
-            viewPager.currentItem = viewPager.currentItem - 1
-        }
-    }*/
 
 }

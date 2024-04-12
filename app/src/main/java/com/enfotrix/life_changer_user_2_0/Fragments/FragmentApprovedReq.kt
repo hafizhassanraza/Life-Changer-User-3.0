@@ -87,8 +87,6 @@ class FragmentApprovedReq : Fragment() {
                     val success =
                         PdfTransaction(sharedPrefManager.getWithdrawReqList().filter{
                             it.status.equals(constants.TRANSACTION_STATUS_APPROVED)
-                        }.sortedByDescending {
-                            it.createdAt
                         }).generatePdf(
                             outputStream
                         )

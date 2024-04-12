@@ -595,11 +595,15 @@ class ActivitySignup : AppCompatActivity() {
                             finish()
 
                         }
+
+
                         else if(jsonObject.getBoolean("success")==false) {
 
                             var error= jsonObject.getString("message")
                             Toast.makeText(mContext, error, Toast.LENGTH_SHORT).show()
                         }
+
+
 
                     }
 

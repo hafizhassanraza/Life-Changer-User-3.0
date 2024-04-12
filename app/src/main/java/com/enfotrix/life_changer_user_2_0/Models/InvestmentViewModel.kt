@@ -52,28 +52,28 @@ class InvestmentViewModel(context: Application) : AndroidViewModel(context) {
 
     fun getProfitAdapter( from:String): TransactionsAdapter {
         //return ProfitTaxAdapter(from,sharedPrefManager.getProfitTaxList().filter{ it.type.equals(constants.PROFIT_TYPE) }.sortedByDescending { it.createdAt })
-        return TransactionsAdapter(from,sharedPrefManager.getProfitList().filter{ it.status.equals(constants.TRANSACTION_STATUS_APPROVED) }.sortedByDescending { it.createdAt })
+        return TransactionsAdapter(from,sharedPrefManager.getProfitList().filter{ it.status.equals(constants.TRANSACTION_STATUS_APPROVED) })
     }
     fun getTaxAdapter( from:String): TransactionsAdapter {
         //return ProfitTaxAdapter(from,sharedPrefManager.getProfitTaxList().filter{ it.type.equals(constants.TAX_TYPE) }.sortedByDescending { it.createdAt })
-        return TransactionsAdapter(from,sharedPrefManager.getTaxList().filter{ it.status.equals(constants.TRANSACTION_STATUS_APPROVED) }.sortedByDescending { it.createdAt })
+        return TransactionsAdapter(from,sharedPrefManager.getTaxList().filter{ it.status.equals(constants.TRANSACTION_STATUS_APPROVED) })
 
     }
     fun getPendingWithdrawReqAdapter( from:String): TransactionsAdapter {
-        return TransactionsAdapter(from,sharedPrefManager.getWithdrawReqList().filter{ it.status.equals(constants.TRANSACTION_STATUS_PENDING) }.sortedByDescending { it.createdAt })
+        return TransactionsAdapter(from,sharedPrefManager.getWithdrawReqList().filter{ it.status.equals(constants.TRANSACTION_STATUS_PENDING) })
     }
     fun getPendingInvestmentReqAdapter( from:String): TransactionsAdapter {
-        return TransactionsAdapter(from,sharedPrefManager.getInvestmentReqList().filter{ it.status.equals(constants.TRANSACTION_STATUS_PENDING) }.sortedByDescending { it.createdAt })
+        return TransactionsAdapter(from,sharedPrefManager.getInvestmentReqList().filter{ it.status.equals(constants.TRANSACTION_STATUS_PENDING) })
     }
     fun getApprovedWithdrawReqAdapter( from:String): TransactionsAdapter {
-        return TransactionsAdapter(from,sharedPrefManager.getWithdrawReqList().filter{ it.status.equals(constants.TRANSACTION_STATUS_APPROVED) }.sortedByDescending { it.createdAt })
+        return TransactionsAdapter(from,sharedPrefManager.getWithdrawReqList().filter{ it.status.equals(constants.TRANSACTION_STATUS_APPROVED) })
     }
 
     fun getApprovedInvestmentReqAdapter( from:String): TransactionsAdapter {
-        return TransactionsAdapter(from,sharedPrefManager.getInvestmentReqList().filter{ it.status.equals(constants.TRANSACTION_STATUS_APPROVED) }.sortedByDescending { it.createdAt })
+        return TransactionsAdapter(from,sharedPrefManager.getInvestmentReqList().filter{ it.status.equals(constants.TRANSACTION_STATUS_APPROVED) })
     }
     fun getStatmentAdapter( ): StatmentAdapter {
-        return StatmentAdapter(sharedPrefManager.getTransactionList().filter{ it.status.equals(constants.TRANSACTION_STATUS_APPROVED) }.sortedByDescending { it.createdAt })
+        return StatmentAdapter(sharedPrefManager.getTransactionList().filter{ it.status.equals(constants.TRANSACTION_STATUS_APPROVED) })
     }
 
 

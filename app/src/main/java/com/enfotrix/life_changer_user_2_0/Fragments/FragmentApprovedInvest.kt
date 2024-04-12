@@ -75,8 +75,6 @@ class FragmentApprovedInvest : Fragment() {
                     val success =
                         PdfTransaction(sharedPrefManager.getInvestmentReqList().filter{
                             it.status.equals(constants.TRANSACTION_STATUS_APPROVED)
-                        }.sortedByDescending {
-                            it.createdAt
                         }
                         ).generatePdf(
                             outputStream

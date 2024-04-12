@@ -167,14 +167,9 @@ class HomeFragment : Fragment() {
             startActivity(Intent(mContext, ActivityProfile::class.java))
         }
 
-
-
-
         /*checkData()
         setData()
         getData()*/
-
-
 
         getUser()
 
@@ -191,7 +186,6 @@ class HomeFragment : Fragment() {
 
 
     private fun getUser() {
-
 
 
         utils.startLoadingAnimation()
@@ -471,7 +465,6 @@ class HomeFragment : Fragment() {
         //binding.tvBalance.text= sharedPrefManager.getInvestment().investmentBalance
 
 
-        user.investment.active_investment
 
 
 
