@@ -67,21 +67,23 @@ class ActivityNominee : AppCompatActivity() {
 
         binding.btnNomineeRegister.setOnClickListener{
             if((!IsEmpty()) && IsValid() ) {
+
+
+
                 saveNominee(ModelNominee(
-                    sharedPrefManager.getToken(),
-                    binding.etCNIC.editText?.text.toString(),
-                    binding.etFirstName.editText?.text.toString(),
-                    binding.etLastName.editText?.text.toString(),
+                    "",
+                    "",
+                    "",
                     binding.etAddress.editText?.text.toString(),
+                    "",
+                    binding.etCNIC.editText?.text.toString(),
+                    "",
+                    "",
+                    binding.etFirstName.editText?.text.toString(),
+                    "",
+                    binding.spNominee.selectedItem.toString(),
                     binding.etMobileNumber.editText?.text.toString(),
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    sharedPrefManager.getToken(),
-                    binding.spNominee.selectedItem.toString()
-                ))
+                    binding.etLastName.editText?.text.toString()
             }
 
         }
@@ -95,7 +97,6 @@ class ActivityNominee : AppCompatActivity() {
     fun saveNominee(nominee:ModelNominee){
 
 
-        utils.startLoadingAnimation()
 
 
 
@@ -120,16 +121,17 @@ class ActivityNominee : AppCompatActivity() {
 
                             Toast.makeText(mContext, jsonObject.getString("message").toString(), Toast.LENGTH_SHORT).show()
 
-                            if(intent.getStringExtra(constants.KEY_ACTIVITY_FLOW).equals(constants.VALUE_ACTIVITY_FLOW_USER_DETAILS)){
+                            /*if(intent.getStringExtra(constants.KEY_ACTIVITY_FLOW).equals(constants.VALUE_ACTIVITY_FLOW_USER_DETAILS)){
                                 startActivity(Intent(mContext,ActivityUserDetails::class.java).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK))
                                 finish()
-                            }
+                            }*/
 
 
 
                         }
                         else if(jsonObject.getBoolean("success")==false) {
 
+                            utils.endLoadingAnimation()
                             var error= jsonObject.getString("message")
                             Toast.makeText(mContext, " ${error}", Toast.LENGTH_SHORT).show()
                         }
@@ -155,6 +157,7 @@ class ActivityNominee : AppCompatActivity() {
             }) {
             // Override getParams() to add POST parameters
             override fun getParams(): MutableMap<String, String> {
+
                 val params = HashMap<String, String>()
                 params["address"] = nominee.address
                 params["cnic"] = nominee.cnic

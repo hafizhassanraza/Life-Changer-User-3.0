@@ -93,7 +93,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.ActivityNominee"
-            android:exported="false"
+            android:exported="true"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.ActivityUserDetails"
