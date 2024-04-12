@@ -144,8 +144,8 @@ class ActivityWithdraw : AppCompatActivity() {
 
                             Toast.makeText(mContext, "${transactions.size}", Toast.LENGTH_SHORT).show()
 
-                            if(type.equals("Approved")) binding.rvWithdraws.adapter= TransactionsAdapter(constants.FROM_APPROVED_WITHDRAW_REQ,transactions)
-                            if(type.equals("Pending")) binding.rvWithdraws.adapter= TransactionsAdapter(constants.FROM_PENDING_WITHDRAW_REQ,transactions)
+                            if(status.equals("Approved")) binding.rvWithdraws.adapter= TransactionsAdapter(constants.FROM_APPROVED_WITHDRAW_REQ,transactions)
+                            if(status.equals("Pending")) binding.rvWithdraws.adapter= TransactionsAdapter(constants.FROM_PENDING_WITHDRAW_REQ,transactions)
 
 
 
