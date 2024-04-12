@@ -151,9 +151,13 @@ dependencies {
 
     implementation 'com.itextpdf:itext7-core:7.2.1'
 
+<<<<<<< HEAD
 
     //////// refresh
 
+=======
+    ///swipe down to refresh
+>>>>>>> origin/main
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
 
 }

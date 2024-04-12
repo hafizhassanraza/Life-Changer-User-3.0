@@ -15,6 +15,7 @@ import android.view.Window
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
@@ -177,6 +178,10 @@ class HomeFragment : Fragment() {
 
         getUser()
 
+        binding.refreshLayout.setOnRefreshListener {
+            getUser()
+            binding.refreshLayout.isRefreshing = false
+        }
         return root
     }
 
