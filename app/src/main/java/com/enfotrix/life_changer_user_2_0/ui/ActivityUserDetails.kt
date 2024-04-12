@@ -535,8 +535,7 @@ class ActivityUserDetails : AppCompatActivity() {
 
                             var data = jsonObject.getJSONObject("data")
 
-
-                            Toast.makeText(mContext, " d1 $data", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(mContext, "$data", Toast.LENGTH_SHORT).show()
 
                             isNomineeAdded = data.getBoolean("isNomineeAdded")
                             isNomineeCNICAdded = data.getBoolean("NomineeCnicFront")
@@ -544,8 +543,6 @@ class ActivityUserDetails : AppCompatActivity() {
                             isUserPhotoAdded = data.getBoolean("UserProfilePhoto")
                             isNomineeBankAdded = data.getBoolean("isNomineeBankAdded")
                             isUserBankAdded = data.getBoolean("isUserBankAdded")
-
-
 
                             setData()
 
