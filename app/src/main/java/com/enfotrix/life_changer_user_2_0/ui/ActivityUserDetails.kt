@@ -538,12 +538,14 @@ class ActivityUserDetails : AppCompatActivity() {
 
                             Toast.makeText(mContext, " d1 $data", Toast.LENGTH_SHORT).show()
 
+                            isNomineeAdded = data.getBoolean("isNomineeAdded")
                             isNomineeCNICAdded = data.getBoolean("NomineeCnicFront")
                             isUserCNICAdded = data.getBoolean("UserCnicFront")
                             isUserPhotoAdded = data.getBoolean("UserProfilePhoto")
-                            isNomineeAdded = data.getBoolean("isNomineeAdded")
                             isNomineeBankAdded = data.getBoolean("isNomineeBankAdded")
                             isUserBankAdded = data.getBoolean("isUserBankAdded")
+
+
 
                             setData()
 
@@ -553,8 +555,9 @@ class ActivityUserDetails : AppCompatActivity() {
 
                         } else if (jsonObject.getBoolean("success") == false) {
 
+
                             var error = jsonObject.getString("message")
-                            Toast.makeText(mContext, " ${error}", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(mContext, "d1 ${error}", Toast.LENGTH_SHORT).show()
                         }
 
                     }

@@ -2,7 +2,6 @@ package com.enfotrix.life_changer_user_2_0.Fragments
 
 import User
 import android.app.Dialog
-import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -14,20 +13,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.Toast
-import androidx.core.content.ContextCompat.getColor
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
-import com.enfotrix.life_changer_user_2_0.BuildConfig
 import com.enfotrix.life_changer_user_2_0.Constants
-import com.enfotrix.life_changer_user_2_0.databinding.FragmentHomeBinding
-import com.enfotrix.life_changer_user_2_0.Models.InvestmentModel
 import com.enfotrix.life_changer_user_2_0.Models.InvestmentViewModel
-import com.enfotrix.life_changer_user_2_0.Models.ModelAnnouncement
-import com.enfotrix.life_changer_user_2_0.Models.ModelBankAccount
 import com.enfotrix.life_changer_user_2_0.Models.ModelUser
 import com.enfotrix.life_changer_user_2_0.Models.NotificationModel
 import com.enfotrix.life_changer_user_2_0.Models.TransactionModel
@@ -35,6 +28,7 @@ import com.enfotrix.life_changer_user_2_0.Models.UserViewModel
 import com.enfotrix.life_changer_user_2_0.R
 import com.enfotrix.life_changer_user_2_0.SharedPrefManager
 import com.enfotrix.life_changer_user_2_0.Utils
+import com.enfotrix.life_changer_user_2_0.databinding.FragmentHomeBinding
 import com.enfotrix.life_changer_user_2_0.ui.ActivityInvestment
 import com.enfotrix.life_changer_user_2_0.ui.ActivityNavDrawer
 import com.enfotrix.life_changer_user_2_0.ui.ActivityNewInvestmentReq
@@ -45,18 +39,8 @@ import com.enfotrix.life_changer_user_2_0.ui.ActivityProfitTax
 import com.enfotrix.life_changer_user_2_0.ui.ActivityStatment
 import com.enfotrix.life_changer_user_2_0.ui.ActivityTax
 import com.enfotrix.life_changer_user_2_0.ui.ActivityWithdraw
-import com.enfotrix.life_changer_user_2_0.ui.MainActivity
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.material.snackbar.Snackbar
-import com.google.android.play.core.appupdate.AppUpdateOptions
-import com.google.android.play.core.install.InstallStateUpdatedListener
-import com.google.android.play.core.install.model.AppUpdateType
-import com.google.android.play.core.install.model.InstallStatus
-import com.google.android.play.core.install.model.UpdateAvailability
 import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.Gson
 import org.json.JSONException
 import org.json.JSONObject

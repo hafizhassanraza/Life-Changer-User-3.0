@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/refreshLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" layout_height="">
+<ScrollView
     android:scrollbars="none"
     android:orientation="vertical"
     android:layout_width="match_parent"
@@ -1249,3 +1252,4 @@
 
 
 </ScrollView>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

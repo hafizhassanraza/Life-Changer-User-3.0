@@ -67,9 +67,6 @@ class ActivityNominee : AppCompatActivity() {
 
         binding.btnNomineeRegister.setOnClickListener{
             if((!IsEmpty()) && IsValid() ) {
-
-
-
                 saveNominee(ModelNominee(
                     "",
                     "",
@@ -83,7 +80,8 @@ class ActivityNominee : AppCompatActivity() {
                     "",
                     binding.spNominee.selectedItem.toString(),
                     binding.etMobileNumber.editText?.text.toString(),
-                    binding.etLastName.editText?.text.toString()
+                    binding.etLastName.editText?.text.toString())
+                )
             }
 
         }
@@ -95,10 +93,6 @@ class ActivityNominee : AppCompatActivity() {
 
 
     fun saveNominee(nominee:ModelNominee){
-
-
-
-
 
         utils.startLoadingAnimation()
         val url = "http://192.168.0.103:8000/api/add-nominee"
@@ -121,10 +115,10 @@ class ActivityNominee : AppCompatActivity() {
 
                             Toast.makeText(mContext, jsonObject.getString("message").toString(), Toast.LENGTH_SHORT).show()
 
-                            /*if(intent.getStringExtra(constants.KEY_ACTIVITY_FLOW).equals(constants.VALUE_ACTIVITY_FLOW_USER_DETAILS)){
+                            if(intent.getStringExtra(constants.KEY_ACTIVITY_FLOW).equals(constants.VALUE_ACTIVITY_FLOW_USER_DETAILS)){
                                 startActivity(Intent(mContext,ActivityUserDetails::class.java).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK))
                                 finish()
-                            }*/
+                            }
 
 
 
@@ -144,7 +138,6 @@ class ActivityNominee : AppCompatActivity() {
                     Toast.makeText(mContext, e.message.toString(), Toast.LENGTH_SHORT).show()
                     // Handle JSON parsing error
                 }
-
 
 
             },
