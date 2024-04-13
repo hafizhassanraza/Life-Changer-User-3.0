@@ -2,7 +2,13 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
+      <entry key="ActivityLogin">
+        <State />
+      </entry>
       <entry key="ActivityNewInvestmentReq">
+        <State />
+      </entry>
+      <entry key="ActivityUserDetails">
         <State />
       </entry>
       <entry key="MainActivity">

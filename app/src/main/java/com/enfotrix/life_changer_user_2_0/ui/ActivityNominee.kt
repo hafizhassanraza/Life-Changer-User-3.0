@@ -18,6 +18,7 @@ import com.enfotrix.life_changer_user_2_0.Data.Repo
 import com.enfotrix.life_changer_user_2_0.Models.ModelNominee
 import com.enfotrix.life_changer_user_2_0.Models.NomineeViewModel
 import com.enfotrix.life_changer_user_2_0.SharedPrefManager
+import com.enfotrix.life_changer_user_2_0.StaticEnvironment.Companion.isNomineeAdded
 import com.enfotrix.life_changer_user_2_0.Utils
 import com.enfotrix.life_changer_user_2_0.databinding.ActivityNomineeBinding
 import kotlinx.coroutines.launch
@@ -115,6 +116,7 @@ class ActivityNominee : AppCompatActivity() {
                             Toast.makeText(mContext, jsonObject.getString("message").toString(), Toast.LENGTH_SHORT).show()
 
                             if(intent.getStringExtra(constants.KEY_ACTIVITY_FLOW).equals(constants.VALUE_ACTIVITY_FLOW_USER_DETAILS)){
+                                isNomineeAdded=true
                                 startActivity(Intent(mContext,ActivityUserDetails::class.java).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK))
                                 finish()
                             }

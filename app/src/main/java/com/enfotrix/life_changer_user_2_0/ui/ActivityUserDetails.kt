@@ -43,6 +43,12 @@ import com.enfotrix.life_changer_user_2_0.Models.NomineeViewModel
 import com.enfotrix.life_changer_user_2_0.Models.UserViewModel
 import com.enfotrix.life_changer_user_2_0.R
 import com.enfotrix.life_changer_user_2_0.SharedPrefManager
+import com.enfotrix.life_changer_user_2_0.StaticEnvironment.Companion.isNomineeAdded
+import com.enfotrix.life_changer_user_2_0.StaticEnvironment.Companion.isNomineeBankAdded
+import com.enfotrix.life_changer_user_2_0.StaticEnvironment.Companion.isUserBankAdded
+import com.enfotrix.life_changer_user_2_0.StaticEnvironment.Companion.isUserPhotoAdded
+import com.enfotrix.life_changer_user_2_0.StaticEnvironment.Companion.isUserCNICAdded
+import com.enfotrix.life_changer_user_2_0.StaticEnvironment.Companion.isNomineeCNICAdded
 import com.enfotrix.life_changer_user_2_0.Utils
 import com.enfotrix.life_changer_user_2_0.api.Requests.ReqAddAccount
 import com.enfotrix.life_changer_user_2_0.databinding.ActivityUserDetailsBinding
@@ -106,12 +112,7 @@ class ActivityUserDetails : AppCompatActivity() {
     private lateinit var dialog: Dialog
 
 
-    var isNomineeAdded: Boolean = false
-    var isNomineeBankAdded: Boolean = false
-    var isUserBankAdded: Boolean = false
-    var isUserPhotoAdded: Boolean = false
-    var isUserCNICAdded: Boolean = false
-    var isNomineeCNICAdded: Boolean = false
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -125,7 +126,7 @@ class ActivityUserDetails : AppCompatActivity() {
 
         binding.btnStart.visibility = View.GONE
 
-        checkProfileStatus()
+        //checkProfileStatus()
 
 
         /*binding.layInvestorPhone.setOnClickListener {
@@ -510,7 +511,7 @@ class ActivityUserDetails : AppCompatActivity() {
 
     }
 
-    private fun checkProfileStatus() {
+    /*private fun checkProfileStatus() {
 
 
 
@@ -593,7 +594,7 @@ class ActivityUserDetails : AppCompatActivity() {
 
 
 
-    }
+    }*/
 
     fun showAddCnicDialog(type: String) {
 
@@ -815,8 +816,7 @@ class ActivityUserDetails : AppCompatActivity() {
                                 jsonObject.getString("message").toString(),
                                 Toast.LENGTH_SHORT
                             ).show()
-                            if (req.type.equals(constants.VALUE_DIALOG_FLOW_NOMINEE_BANK)) isNomineeBankAdded =
-                                true
+                            if (req.type.equals(constants.VALUE_DIALOG_FLOW_NOMINEE_BANK)) isNomineeBankAdded = true
                             else isUserBankAdded = true
                             setData()
 
