@@ -109,5 +109,7 @@ class UserViewModel(context: Application) : AndroidViewModel(context) {
 //    ): LiveData<Boolean> {
 //        return userRepo.updateUser(firstName, lastName, address, mobileNumber)
 //    }*/
-
+fun getInvestorAccountsAdapter_(fromActivity:String, listener: InvestorAccountsAdapter.OnItemClickListener,accountsList: List<ModelBankAccount> ): InvestorAccountsAdapter {
+    return InvestorAccountsAdapter(fromActivity,accountsList, listener)
+}
 }

@@ -5,6 +5,7 @@ import android.os.Bundle
 import com.enfotrix.life_changer_user_2_0.databinding.ActivityInvestmentPlansBinding
 
 class ActivityInvestmentPlans : AppCompatActivity() {
+
     private lateinit var binding: ActivityInvestmentPlansBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
