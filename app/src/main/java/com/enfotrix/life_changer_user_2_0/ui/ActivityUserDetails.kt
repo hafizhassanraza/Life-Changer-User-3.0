@@ -144,6 +144,7 @@ class ActivityUserDetails : AppCompatActivity() {
         }*/
 
 
+        setData()
 
         binding.layAddNominee.setOnClickListener {
 
