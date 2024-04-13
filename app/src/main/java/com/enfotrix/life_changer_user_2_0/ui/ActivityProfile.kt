@@ -10,8 +10,11 @@ import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
+import android.view.Window
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -20,6 +23,7 @@ import com.bumptech.glide.Glide
 import com.enfotrix.life_changer_user_2_0.Constants
 import com.enfotrix.life_changer_user_2_0.Data.Repo
 import com.enfotrix.life_changer_user_2_0.Models.ModelAnnouncement
+import com.enfotrix.life_changer_user_2_0.Models.ModelBankAccount
 import com.enfotrix.life_changer_user_2_0.Models.ModelFA
 import com.enfotrix.life_changer_user_2_0.Models.UserViewModel
 import com.enfotrix.life_changer_user_2_0.R
@@ -48,6 +52,7 @@ class ActivityProfile : AppCompatActivity() {
     private lateinit var user: User
     private lateinit var sharedPrefManager: SharedPrefManager
     private lateinit var dialog: Dialog
+
     private lateinit var dialogPinUpdate: Dialog
     private lateinit var dialogPhoto: Dialog
     private lateinit var dialogUpdateTaken: Dialog
@@ -86,6 +91,9 @@ class ActivityProfile : AppCompatActivity() {
         binding.layPin.setOnClickListener {
             showUpdatePinDialog()
         }
+        binding.editName.setOnClickListener {
+            updateNameDialog()
+        }
 
         checkData()
         setData()
@@ -117,6 +125,27 @@ class ActivityProfile : AppCompatActivity() {
             }
         }
     }
+
+
+
+
+    fun updateNameDialog(){
+
+        dialog = Dialog (mContext)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.setContentView(R.layout.dialog_update_name)
+        val userName = dialog.findViewById<TextView>(R.id.name)
+        val fatherName = dialog.findViewById<TextView>(R.id.fatherName)
+        val editBtn = dialog.findViewById<Spinner>(R.id.spBank)
+        dialog.show()
+
+
+    }
+
+
+
+
     suspend fun uploadImage(imageUri: Uri, type: String) {
         utils.startLoadingAnimation()
 
@@ -220,6 +249,7 @@ class ActivityProfile : AppCompatActivity() {
         binding.tvCNIC.text = sharedPrefManager.getUser().cnic
         binding.tvAddress.text = sharedPrefManager.getUser().address
         binding.tvFatherName.text = sharedPrefManager.getUser().father_name
+        Toast.makeText(mContext, "father::"+sharedPrefManager.getUser().father_name.toString(), Toast.LENGTH_SHORT).show()
         binding.tvPhoneNumber.text = sharedPrefManager.getUser().phone
 
         /*binding.tvNomineeName.text = sharedPrefManager.getNominee().firstName

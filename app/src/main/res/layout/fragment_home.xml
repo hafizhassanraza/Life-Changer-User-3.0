@@ -16,17 +16,19 @@
             android:layout_height="match_parent"
             android:layout_marginTop="10dp"
             android:orientation="vertical">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="swipe down to refresh"
-                android:textSize="12dp"
-                android:alpha="0.5"
-                android:layout_gravity="center_horizontal"/>
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:alpha="0.5"
+                    android:text="swipe down to refresh"
+                    android:textSize="14dp" />
+
                 <ImageView
                     android:id="@+id/img_drawer"
                     android:layout_width="45dp"
@@ -145,7 +147,7 @@
                             android:layout_width="280dp"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/inter"
-                            android:text="Malik Muhaammad Mujahid Khokhar"
+                            android:text="--------"
                             android:layout_marginTop="5dp"
                             android:textColor="@color/white"
                             android:textSize="18dp"
@@ -204,7 +206,7 @@
                                 android:id="@+id/tvBalance"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="20,00000000000"
+                                android:text="---"
                                 android:textColor="@color/white"
                                 android:textSize="25dp"
                                 android:textStyle="bold" />
@@ -353,7 +355,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
-                            android:text="00"
+                            android:text="--"
                             android:textColor="@color/black"
                             android:textSize="15sp"
                             android:textStyle="bold" />
@@ -390,7 +392,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
-                            android:text="00"
+                            android:text="--"
                             android:textColor="@color/black"
                             android:textSize="15sp"
                             android:textStyle="bold"/>
@@ -427,7 +429,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
-                            android:text="00"
+                            android:text="--"
                             android:textColor="@color/yellow"
                             android:textSize="15sp"
                             android:textStyle="bold"/>
