@@ -37,6 +37,7 @@ import com.enfotrix.life_changer_user_2_0.Models.UserViewModel
 import com.enfotrix.life_changer_user_2_0.R
 import com.enfotrix.life_changer_user_2_0.SharedPrefManager
 import com.enfotrix.life_changer_user_2_0.Utils
+import com.enfotrix.life_changer_user_2_0.api.Requests.ReqAddAccount
 import com.enfotrix.life_changer_user_2_0.databinding.ActivityAddInvestmentBinding
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.gson.Gson
@@ -75,15 +76,6 @@ class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.On
     private val IMAGE_PICKER_REQUEST_CODE = 200
     private var userReceiptPhoto: Boolean = false
 
-
-
-
-
-
-
-
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAddInvestmentBinding.inflate(layoutInflater)
@@ -91,14 +83,10 @@ class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.On
         setContentView(binding.root)
 
         mContext=this@ActivityNewInvestmentReq
-
         utils = Utils(mContext)
-
         constants= Constants()
         sharedPrefManager = SharedPrefManager(mContext)
         setTitle("Add Investment Request")
-
-
         getAccounts()
 
 
@@ -436,12 +424,11 @@ class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.On
 
 
                 updateInvestorBankList(
-                    ModelBankAccount(
-                        "",
+                    ReqAddAccount(
+                        "user",
                         spBank.selectedItem.toString(),
                         etAccountTittle.text.toString(),
                         etAccountNumber.text.toString(),
-                        sharedPrefManager.getToken()
                     )
                 )
             }
@@ -454,48 +441,57 @@ class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.On
 
     }
 
-    fun updateInvestorBankList(modelBankAccount: ModelBankAccount) {
 
+
+    fun updateInvestorBankList(modelBankAccount: ReqAddAccount) {
         utils.startLoadingAnimation()
-        lifecycleScope.launch {
-            userViewModel.addUserAccount(modelBankAccount)
-                .observe(this@ActivityNewInvestmentReq) {
-                    dialogAddA.dismiss()
-                    if (it == true) {
-
-                        lifecycleScope.launch{
-                            userViewModel.getUserAccounts(sharedPrefManager.getToken())
-                                .addOnCompleteListener{task ->
-                                    utils.endLoadingAnimation()
-                                    if (task.isSuccessful) {
-                                        val list = ArrayList<ModelBankAccount>()
-                                        if(task.result.size()>0){
-                                            for (document in task.result) list.add( document.toObject(ModelBankAccount::class.java))
-                                            sharedPrefManager.putInvestorBankList(list)
-                                            Toast.makeText(mContext, constants.ACCOPUNT_ADDED_MESSAGE, Toast.LENGTH_SHORT).show()
-                                        }
-                                    }
-                                    else Toast.makeText(mContext, constants.SOMETHING_WENT_WRONG_MESSAGE, Toast.LENGTH_SHORT).show()
-
-                                }
-                                .addOnFailureListener{
-                                    utils.endLoadingAnimation()
-                                    Toast.makeText(mContext, it.message+"", Toast.LENGTH_SHORT).show()
-
-                                }
-
-
+        val url = "http://192.168.0.103:8000/api/add-account"
+        val stringRequest = object : StringRequest(
+            Request.Method.POST, url,
+            Response.Listener { response ->
+                utils.endLoadingAnimation()
+                try {
+                    val jsonObject = JSONObject(response)
+                    if (jsonObject != null) {
+                        if (jsonObject.getBoolean("success")) {
+                            getAccounts()
+                            dialogAddA.dismiss()
+                        } else {
+                            val error = jsonObject.getString("message")
+                            Toast.makeText(mContext, error, Toast.LENGTH_SHORT).show()
                         }
-
                     }
-                    else {
-                        utils.endLoadingAnimation()
-                        Toast.makeText(mContext, constants.SOMETHING_WENT_WRONG_MESSAGE, Toast.LENGTH_SHORT).show()
-                    }
+                } catch (e: JSONException) {
+                    dialogAddA.dismiss()
 
+                    e.printStackTrace()
+                    Toast.makeText(mContext, e.message.toString(), Toast.LENGTH_SHORT).show()
                 }
+            },
+            Response.ErrorListener { error ->
+                dialogAddA.dismiss()
+                utils.endLoadingAnimation()
+                Toast.makeText(mContext, "Response: ${error.message}", Toast.LENGTH_SHORT).show()
+                Log.e("VolleyError", "Error: $error")
+            }) {
 
+            override fun getParams(): MutableMap<String, String> {
+                val params = HashMap<String, String>()
+                params["type"] = modelBankAccount.type
+                params["bank_name"] = modelBankAccount.bank_name
+                params["account_tittle"] = modelBankAccount.account_tittle
+                params["account_number"] = modelBankAccount.account_number
+                return params
+            }
+
+            override fun getHeaders(): MutableMap<String, String> {
+                val headers = HashMap<String, String>()
+                headers["Authorization"] = "Bearer ${sharedPrefManager.getToken()}"
+                return headers
+            }
         }
+
+        Volley.newRequestQueue(mContext).add(stringRequest)
 
     }
 

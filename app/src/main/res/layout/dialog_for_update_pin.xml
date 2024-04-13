@@ -14,7 +14,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/secondary_m"
-
             android:orientation="vertical">
 
             <View
@@ -34,8 +33,6 @@
                 android:layout_marginTop="20dp"
                 android:textSize="20dp"
                 android:textStyle="bold"/>
-
-
             <TextView
                 android:id="@+id/tvDisc"
                 android:layout_width="wrap_content"
