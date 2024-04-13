@@ -61,6 +61,13 @@ class ActivityInvestment : AppCompatActivity() {
         sharedPrefManager = SharedPrefManager(mContext)
 
 
+        binding.refreshLayout.setOnRefreshListener {
+
+            binding.refreshLayout.isRefreshing = false
+        }
+
+
+
 
 
 

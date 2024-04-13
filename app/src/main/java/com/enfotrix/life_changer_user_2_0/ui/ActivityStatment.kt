@@ -68,6 +68,14 @@ class ActivityStatment : AppCompatActivity() {
 
 
 
+        binding.refreshLayout.setOnRefreshListener {
+
+            getTransaction( "All", "Approved" )
+
+
+            binding.refreshLayout.isRefreshing = false
+        }
+
     }
 
 

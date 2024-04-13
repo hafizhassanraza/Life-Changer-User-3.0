@@ -76,6 +76,14 @@ class ActivityTax : AppCompatActivity() {
         binding.imgBack.setOnClickListener{finish()}
 
 
+
+        binding.refreshLayout.setOnRefreshListener {
+            getTransaction( "Tax", "Approved" )
+
+            binding.refreshLayout.isRefreshing = false
+        }
+
+
     }
 
 

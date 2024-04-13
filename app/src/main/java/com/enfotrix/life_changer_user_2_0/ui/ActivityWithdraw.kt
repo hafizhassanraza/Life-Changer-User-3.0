@@ -62,6 +62,15 @@ class ActivityWithdraw : AppCompatActivity() {
         constants= Constants()
         sharedPrefManager = SharedPrefManager(mContext)
 
+        binding.refreshLayout.setOnRefreshListener {
+
+
+            getTransaction( "Withdraw", "Approved" )
+
+            binding.refreshLayout.isRefreshing = false
+        }
+
+
 
 
 

@@ -73,6 +73,12 @@ class ActivityProfitTax : AppCompatActivity() {
         }*/
         binding.imgBack.setOnClickListener{finish()}
 
+        binding.refreshLayout.setOnRefreshListener {
+            getTransaction( "Profit", "Approved" )
+
+            binding.refreshLayout.isRefreshing = false
+        }
+
 
     }
 

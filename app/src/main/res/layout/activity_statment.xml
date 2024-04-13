@@ -1,17 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/refreshLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.ActivityStatment">
+
+<LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".ui.ActivityStatment">
+    >
 
 
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp">
         <ImageView
             android:id="@+id/imgBack"
             android:layout_width="35dp"
@@ -36,8 +46,15 @@
     </RelativeLayout>
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:alpha="0.5"
+            android:text="swipe down to refresh"
+            android:textSize="14dp" />
 
         <HorizontalScrollView
             android:id="@+id/hsv"
@@ -46,6 +63,7 @@
             android:scrollbars="none"
             android:layout_marginStart="1dp"
             android:layout_marginEnd="1dp"
+            android:layout_marginTop="5dp"
             android:foregroundGravity="center_vertical">
 
             <LinearLayout
@@ -55,6 +73,9 @@
                 android:layout_marginRight="20dp"
                 android:layout_marginTop="20dp"
                 android:orientation="vertical">
+
+
+
 
 
                 <LinearLayout
@@ -140,3 +161,4 @@
 
 
 </LinearLayout>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
