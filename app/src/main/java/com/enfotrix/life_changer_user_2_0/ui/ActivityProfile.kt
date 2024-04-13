@@ -102,9 +102,8 @@ class ActivityProfile : AppCompatActivity() {
             }
             layNominee.setOnClickListener {
                 val intent = Intent(mContext, ActivityEditNominee::class.java)
-                val userJson = Gson().toJson(user_)
-                intent.putExtra("user_model", userJson)
                 startActivity(intent)
+
             }
         }
 
