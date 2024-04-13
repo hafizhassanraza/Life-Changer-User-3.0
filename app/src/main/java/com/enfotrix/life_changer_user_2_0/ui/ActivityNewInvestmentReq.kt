@@ -23,6 +23,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
+import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
@@ -126,14 +127,9 @@ class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.On
             }
             else if (userReceiptPhoto!=true || imageURI == null) Toast.makeText(mContext, "Please select the transaction image", Toast.LENGTH_SHORT).show()
 
-            else{
+            else addInvestmentReq()
 
 
-
-
-                addInvestmentReq()
-
-            }
 
         }
 
@@ -505,33 +501,100 @@ class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.On
 
     fun addInvestmentReq() {
 
-        /*sharedPrefManager.getToken(),
-        constants.TRANSACTION_TYPE_INVESTMENT,
-        constants.TRANSACTION_STATUS_PENDING,
-        binding.tvBalance.text.toString(),
-        adminAccountID,
-        expectedSum.toString(),
-        accountID
+
+
 
 
         utils.startLoadingAnimation()
-        lifecycleScope.launch {
-            investmentViewModel.addTransactionReqWithImage(transactionModel,imageURI!!,"userTransactionReceipt").observe(this@ActivityNewInvestmentReq){
+        val url = "http://192.168.0.103:8000/api/add-transaction"
+
+        val stringRequest = object : StringRequest(
+            Request.Method.POST, url,
+            Response.Listener { response ->
+                // Handle the response
                 utils.endLoadingAnimation()
 
-                if (it == true){
-                    //dialog.dismiss()
-                    Toast.makeText(mContext, "Request Submitted Successfully!", Toast.LENGTH_SHORT).show()
-                    startActivity(Intent(mContext,MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK))
-                    finish()
-                }
-                else {
-                    Toast.makeText(mContext, constants.SOMETHING_WENT_WRONG_MESSAGE, Toast.LENGTH_SHORT).show()
+
+                try {
+
+                    val jsonObject = JSONObject(response)
+
+                    if(jsonObject!=null){
+
+                        if(jsonObject.getBoolean("success")==true){
+
+
+                            Toast.makeText(mContext, "Investment Req. Sent!", Toast.LENGTH_SHORT).show()
+                            startActivity(Intent(mContext,MainActivity::class.java)
+                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK))
+                            finish()
+
+                        }
+
+
+                        else if(jsonObject.getBoolean("success")==false) {
+
+                            var error= jsonObject.getString("message")
+                            Toast.makeText(mContext, "d1:$error", Toast.LENGTH_SHORT).show()
+                            //Toast.makeText(mContext, "response fail", Toast.LENGTH_SHORT).show()
+                        }
+
+
+
+                    }
+
+
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                    Toast.makeText(mContext, "d2"+e.message.toString(), Toast.LENGTH_SHORT).show()
+                    // Handle JSON parsing error
                 }
 
 
+
+            },
+            Response.ErrorListener { error ->
+                // Handle errors
+                utils.endLoadingAnimation()
+                Toast.makeText(mContext, "Response: ${error.message}", Toast.LENGTH_SHORT).show()
+
+                Log.e("VolleyError", "Error: $error")
+            }) {
+            // Override getParams() to add POST parameters
+            override fun getParams(): MutableMap<String, String> {
+                val params = HashMap<String, String>()
+
+
+
+
+
+                params["amount"] = binding.tvBalance.text.toString()
+                params["receiver_account_id"] = adminAccountID
+                params["sender_account_id"] = accountID
+                params["type"] =constants.TRANSACTION_TYPE_INVESTMENT
+                params["receipt"] = "ikshdksgc"
+                return params
             }
-        }*/
+            override fun getHeaders(): MutableMap<String, String> {
+                val headers = HashMap<String, String>()
+                headers["Authorization"] =
+                    "Bearer ${sharedPrefManager.getToken()}" // Replace "token" with your actual token
+                return headers
+            }
+
+
+
+        }
+
+
+        Volley.newRequestQueue(mContext).add(stringRequest)
+
+
+
+
+
+
+
     }
 
 
@@ -610,15 +673,14 @@ class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.On
             binding.tvAccountNumber.text=modelBankAccount.account_number
             binding.tvBankName.text=modelBankAccount.bank_name
             binding.tvAccountTittle.text=modelBankAccount.account_tittle
-            //accountID=modelBankAccount.docID
-            //Toast.makeText(mContext, accountID+"", Toast.LENGTH_SHORT).show()
+            accountID=modelBankAccount.id
         }
         else {
 
             binding.tvAdminAccountNumber.text=modelBankAccount.account_number
             binding.tvAdminBankName.text=modelBankAccount.bank_name
             binding.tvAdminAccountTittle.text=modelBankAccount.account_tittle
-            //adminAccountID=modelBankAccount.docID
+            adminAccountID=modelBankAccount.id
         }
 
     }

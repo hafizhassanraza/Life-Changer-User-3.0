@@ -347,6 +347,8 @@ class ActivityProfile : AppCompatActivity() {
             Response.Listener { response ->
                 // Handle the response
                 utils.endLoadingAnimation()
+                //Log.d("Response D", response)
+
 
                 try {
 

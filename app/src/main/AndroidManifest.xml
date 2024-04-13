@@ -80,7 +80,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.ActivityNewInvestmentReq"
-            android:exported="false"
+            android:exported="true"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.ActivityWithdraw"
