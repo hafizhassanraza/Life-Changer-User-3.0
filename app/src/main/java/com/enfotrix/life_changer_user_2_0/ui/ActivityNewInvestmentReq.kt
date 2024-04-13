@@ -8,6 +8,7 @@ import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.View
 import android.view.Window
 import android.widget.Button
@@ -21,10 +22,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.android.volley.Request
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
+import com.bumptech.glide.Glide
 import com.enfotrix.life_changer_user_2_0.Adapters.InvestorAccountsAdapter
 import com.enfotrix.life_changer_user_2_0.Constants
 import com.enfotrix.life_changer_user_2_0.Models.InvestmentViewModel
 import com.enfotrix.life_changer_user_2_0.Models.ModelBankAccount
+import com.enfotrix.life_changer_user_2_0.Models.ModelUser
 import com.enfotrix.life_changer_user_2_0.Models.TransactionModel
 import com.enfotrix.life_changer_user_2_0.Models.UserViewModel
 import com.enfotrix.life_changer_user_2_0.R
@@ -32,7 +38,11 @@ import com.enfotrix.life_changer_user_2_0.SharedPrefManager
 import com.enfotrix.life_changer_user_2_0.Utils
 import com.enfotrix.life_changer_user_2_0.databinding.ActivityAddInvestmentBinding
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.launch
+import org.json.JSONException
+import org.json.JSONObject
 
 class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.OnItemClickListener {
 
@@ -40,12 +50,18 @@ class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.On
     private val investmentViewModel: InvestmentViewModel by viewModels()
     private lateinit var binding : ActivityAddInvestmentBinding
 
+    private lateinit var userAccounts: List<ModelBankAccount>
+    private lateinit var adminAccounts: List<ModelBankAccount>
+
     private lateinit var utils: Utils
     private lateinit var mContext: Context
     private lateinit var constants: Constants
     private lateinit var sharedPrefManager : SharedPrefManager
     private lateinit var dialog : BottomSheetDialog
     private lateinit var dialogAddA : Dialog
+
+    private var expectedSum: Int=0
+
 
     private var investorAccount:Boolean=true
 
@@ -57,6 +73,10 @@ class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.On
     private var imageURI: Uri? = null
     private val IMAGE_PICKER_REQUEST_CODE = 200
     private var userReceiptPhoto: Boolean = false
+
+
+
+
 
 
 
@@ -77,13 +97,13 @@ class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.On
         sharedPrefManager = SharedPrefManager(mContext)
         setTitle("Add Investment Request")
 
-        // binding.rvInvestorAccounts.layoutManager = LinearLayoutManager(mContext)
 
-        binding.layInvestorAccountSelect.setOnClickListener { getAccounts(constants.VALUE_DIALOG_FLOW_INVESTOR) }
-        binding.layAdminAccountSelect.setOnClickListener { getAccounts(constants.VALUE_DIALOG_FLOW_ADMIN) }
+        getAccounts()
+
 
         binding.cvReceipt.setOnClickListener { showReceiptDialog() }
-
+        binding.layInvestorAccountSelect.setOnClickListener { getAccounts(constants.VALUE_DIALOG_FLOW_INVESTOR) }
+        binding.layAdminAccountSelect.setOnClickListener { getAccounts(constants.VALUE_DIALOG_FLOW_ADMIN) }
 
         binding.layBalance.setOnClickListener { showAddBalanceDialog() }
         binding.btnInvestment.setOnClickListener {
@@ -106,33 +126,266 @@ class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.On
             }
             else if (userReceiptPhoto!=true || imageURI == null) Toast.makeText(mContext, "Please select the transaction image", Toast.LENGTH_SHORT).show()
 
-            else {
-
-
-              /*  val investmentBalance = sharedPrefManager.getInvestment().investmentBalance
-                val lastProfit = sharedPrefManager.getInvestment().lastProfit
-                val lastInvestment = sharedPrefManager.getInvestment().lastInvestment
-                val ExpextedSum = getTextFromInvestment(investmentBalance).toDouble() + getTextFromInvestment(lastProfit).toDouble() + getTextFromInvestment(lastInvestment).toDouble()
+            else{
 
 
 
-                addInvestmentReq(
-                    TransactionModel(
-                        sharedPrefManager.getToken(),
-                        constants.TRANSACTION_TYPE_INVESTMENT,
-                        constants.TRANSACTION_STATUS_PENDING,
-                        binding.tvBalance.text.toString(),
-                        adminAccountID,
-                        ExpextedSum.toInt().toString(),
-                        accountID
-                    )
-                )*/
+
+                addInvestmentReq()
+
             }
 
         }
 
 
     }
+
+
+
+
+
+    private fun getAccounts() {
+
+
+        utils.startLoadingAnimation()
+        val url = "http://192.168.0.103:8000/api/user-data"
+
+        val stringRequest = object : StringRequest(
+            Request.Method.POST, url,
+            com.android.volley.Response.Listener { response ->
+                // Handle the response
+                utils.endLoadingAnimation()
+
+                try {
+
+                    val jsonObject = JSONObject(response)
+
+                    if (jsonObject != null) {
+
+                        if (jsonObject.getBoolean("success") == true) {
+
+
+
+                            val gson = Gson()
+
+                            val user: ModelUser = gson.fromJson(jsonObject.getJSONObject("data").toString(), ModelUser::class.java)
+                            /*var investment = user.investment
+                            val ExpextedSum =  investment.in_active_investment+ investment.active_investment +investment.profit*/
+                            userAccounts= user.accounts
+
+                            //Toast.makeText(mContext, userAccounts.size.toString(), Toast.LENGTH_SHORT).show()
+
+
+
+                            getAdminAccount()
+
+                        } else if (jsonObject.getBoolean("success") == false) {
+
+                            var error = jsonObject.getString("message")
+                            Toast.makeText(mContext, " ${error}", Toast.LENGTH_SHORT).show()
+                        }
+
+                    }
+
+
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                    Toast.makeText(mContext, e.message.toString(), Toast.LENGTH_SHORT).show()
+                    // Handle JSON parsing error
+                }
+
+
+            },
+            com.android.volley.Response.ErrorListener { error ->
+                // Handle errors
+                utils.endLoadingAnimation()
+                Toast.makeText(mContext, "Response: ${error.message}", Toast.LENGTH_SHORT).show()
+
+                Log.e("VolleyError", "Error: $error")
+            }) {
+
+            override fun getHeaders(): MutableMap<String, String> {
+                val headers = HashMap<String, String>()
+                headers["Authorization"] =
+                    "Bearer ${sharedPrefManager.getToken()}" // Replace "token" with your actual token
+                return headers
+            }
+
+
+        }
+
+
+        Volley.newRequestQueue(mContext).add(stringRequest)
+
+
+
+
+    }
+
+
+
+    private fun getAdminAccount() {
+
+
+
+        utils.startLoadingAnimation()
+        val url = "http://192.168.0.103:8000/api/admin-account"
+
+        val stringRequest = object : StringRequest(
+            Request.Method.POST, url,
+            com.android.volley.Response.Listener { response ->
+                // Handle the response
+                utils.endLoadingAnimation()
+
+                try {
+
+                    val jsonObject = JSONObject(response)
+
+                    if (jsonObject != null) {
+
+                        if (jsonObject.getBoolean("success") == true) {
+
+
+
+                            val gson = Gson()
+                            val accounts: List<ModelBankAccount> = gson.fromJson(
+                                jsonObject.getJSONArray("data").toString(),
+                                object : TypeToken<List<ModelBankAccount>>() {}.type
+                            )
+
+                            adminAccounts= accounts
+
+
+
+
+
+
+
+                        } else if (jsonObject.getBoolean("success") == false) {
+
+                            var error = jsonObject.getString("message")
+                            Toast.makeText(mContext, " ${error}", Toast.LENGTH_SHORT).show()
+                        }
+
+                    }
+
+
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                    Toast.makeText(mContext, e.message.toString(), Toast.LENGTH_SHORT).show()
+                    // Handle JSON parsing error
+                }
+
+
+            },
+            com.android.volley.Response.ErrorListener { error ->
+                // Handle errors
+                utils.endLoadingAnimation()
+                Toast.makeText(mContext, "Response: ${error.message}", Toast.LENGTH_SHORT).show()
+
+                Log.e("VolleyError", "Error: $error")
+            }) {
+
+            override fun getHeaders(): MutableMap<String, String> {
+                val headers = HashMap<String, String>()
+                headers["Authorization"] =
+                    "Bearer ${sharedPrefManager.getToken()}" // Replace "token" with your actual token
+                return headers
+            }
+
+
+        }
+
+
+        Volley.newRequestQueue(mContext).add(stringRequest)
+
+
+
+
+    }
+
+
+
+
+    private fun setData(user : ModelUser , adminAccountList : List<ModelBankAccount> ) {
+
+       /* binding.
+
+
+
+        binding.tvAnnouncement.text=sharedPrefManager.getAnnouncement().announcement
+        binding.tvUserName.text= sharedPrefManager.getUser().name
+
+        //binding.uName.text= sharedPrefManager.getUser().firstName
+        //binding.tvBalance.text= sharedPrefManager.getInvestment().investmentBalance
+
+
+
+
+
+
+        val activeInvestment = user!!.investment!!.active_investment
+        val profit = user.investment.profit
+        val inActiveInvestment = user.investment.in_active_investment
+        val ExpextedSum = activeInvestment + inActiveInvestment + profit
+
+        binding.tvBalance.text = activeInvestment.toString()
+        binding.availableProfit.text = profit.toString()
+        binding.tvInActiveInvestment.text = inActiveInvestment.toString()
+        binding.tvExpectedSum.text = ExpextedSum.toString()
+
+        Glide.with(mContext)
+            .load(user.photo)
+            .centerCrop()
+            .placeholder(R.drawable.profile_person_icon) // Placeholder image while loading
+            .into(binding.imageView)*/
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     fun getTextFromInvestment(value: String?): String {
         return if (value.isNullOrEmpty()) "0" else value
     }
@@ -250,7 +503,17 @@ class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.On
 
     }
 
-    fun addInvestmentReq(transactionModel: TransactionModel) {
+    fun addInvestmentReq() {
+
+        /*sharedPrefManager.getToken(),
+        constants.TRANSACTION_TYPE_INVESTMENT,
+        constants.TRANSACTION_STATUS_PENDING,
+        binding.tvBalance.text.toString(),
+        adminAccountID,
+        expectedSum.toString(),
+        accountID
+
+
         utils.startLoadingAnimation()
         lifecycleScope.launch {
             investmentViewModel.addTransactionReqWithImage(transactionModel,imageURI!!,"userTransactionReceipt").observe(this@ActivityNewInvestmentReq){
@@ -268,7 +531,7 @@ class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.On
 
 
             }
-        }
+        }*/
     }
 
 
@@ -287,8 +550,8 @@ class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.On
 
         btnAddBalance.setOnClickListener {
 
-            var balance: Int
-            balance= Integer.parseInt(etBalance.text.toString())
+            var balance: Int= 0
+            if(!etBalance.text.toString().isNullOrEmpty()) balance= Integer.parseInt(etBalance.text.toString())
             if(balance>0){
 
                 if(etBalance.text.toString().isNullOrEmpty()) Toast.makeText(mContext, "enter amount", Toast.LENGTH_SHORT).show()
@@ -298,6 +561,7 @@ class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.On
                 }
 
             }
+            else Toast.makeText(mContext, "Please Enter Balance", Toast.LENGTH_SHORT).show()
 
         }
 
@@ -326,10 +590,14 @@ class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.On
         rvInvestorAccounts = dialog.findViewById<RecyclerView>(R.id.rvInvestorAccounts)as RecyclerView
         rvInvestorAccounts.layoutManager = LinearLayoutManager(mContext)
         if(from.equals(constants.VALUE_DIALOG_FLOW_INVESTOR))
-            rvInvestorAccounts.adapter=userViewModel.getInvestorAccountsAdapter(constants.FROM_NEW_INVESTMENT_REQ,this@ActivityNewInvestmentReq)
+        {
+
+            //Toast.makeText(mContext, userAccounts.size.toString(), Toast.LENGTH_SHORT).show()
+            rvInvestorAccounts.adapter=InvestorAccountsAdapter(constants.FROM_NEW_INVESTMENT_REQ,userAccounts, this@ActivityNewInvestmentReq)
+        }
         else {
             investorAccount=false
-            rvInvestorAccounts.adapter=userViewModel.getAdminAccountsAdapter(constants.FROM_NEW_INVESTMENT_REQ,this@ActivityNewInvestmentReq)
+            rvInvestorAccounts.adapter=InvestorAccountsAdapter(constants.FROM_NEW_INVESTMENT_REQ,adminAccounts, this@ActivityNewInvestmentReq)
         }
         dialog.show()
 

@@ -15,7 +15,10 @@ data class ModelNominee (
     val phone: String,
     val father_name: String
 
-)
+
+
+
+    )
 
 
 

@@ -215,8 +215,8 @@ class HomeFragment : Fragment() {
 
                             val user: ModelUser = gson.fromJson(jsonObject.getJSONObject("data").toString(), ModelUser::class.java)
 
-                            Toast.makeText(mContext, user.toString(), Toast.LENGTH_SHORT).show()
-                            sharedPrefManager.setLoginStatus(user.status)
+                            //Toast.makeText(mContext, user.toString(), Toast.LENGTH_SHORT).show()
+                            //sharedPrefManager.setLoginStatus(user.status)
                             sharedPrefManager.saveUser(user)
 
                             setData(user)
@@ -328,12 +328,7 @@ class HomeFragment : Fragment() {
                 Log.e("VolleyError", "Error: $error")
             }) {
 
-            override fun getHeaders(): MutableMap<String, String> {
-                val headers = HashMap<String, String>()
-                headers["Authorization"] =
-                    "Bearer ${sharedPrefManager.getToken()}" // Replace "token" with your actual token
-                return headers
-            }
+
 
 
         }

@@ -230,7 +230,7 @@ class Repo(val context: Context) {
 
 
     suspend fun uploadPhoto(imageUri: Uri, type:String): UploadTask {
-        return storageRef.child(    type+"/"+sharedPrefManager.getToken()).putFile(imageUri)
+        return storageRef.child(type+"/"+sharedPrefManager.getToken()).putFile(imageUri)
     }
 
     suspend fun uploadPhotoRefrence(imageUri:Uri,type:String): StorageReference {
@@ -300,6 +300,7 @@ class Repo(val context: Context) {
         }
         return result
     }
+
     suspend fun addInvestment(investment: InvestmentModel): LiveData<Boolean> {
         val result = MutableLiveData<Boolean>()
         /*InvestmentCollection.document(investment.investorID).set(investment)
