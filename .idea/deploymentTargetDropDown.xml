@@ -2,36 +2,8 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="ActivityLogin">
-        <State />
-      </entry>
-      <entry key="ActivityNominee">
-        <State />
-      </entry>
-      <entry key="ActivityStatment">
-        <State />
-      </entry>
-      <entry key="ActivityUserDetails">
-        <State />
-      </entry>
-      <entry key="MainActivity">
-        <State />
-      </entry>
       <entry key="app">
-        <State>
-          <runningDeviceTargetSelectedWithDropDown>
-            <Target>
-              <type value="RUNNING_DEVICE_TARGET" />
-              <deviceKey>
-                <Key>
-                  <type value="SERIAL_NUMBER" />
-                  <value value="e4c51569" />
-                </Key>
-              </deviceKey>
-            </Target>
-          </runningDeviceTargetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-04-12T13:53:51.895994800Z" />
-        </State>
+        <State />
       </entry>
     </value>
   </component>
