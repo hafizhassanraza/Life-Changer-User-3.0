@@ -536,8 +536,9 @@ class ActivityUserDetails : AppCompatActivity() {
                             var data = jsonObject.getJSONObject("data")
 
                             Toast.makeText(mContext, "$data", Toast.LENGTH_SHORT).show()
+                             val nominee= data.getBoolean("isNomineeAdded")
 
-                            isNomineeAdded = data.getBoolean("isNomineeAdded")
+                            isNomineeAdded = nominee
                             isNomineeCNICAdded = data.getBoolean("NomineeCnicFront")
                             isUserCNICAdded = data.getBoolean("UserCnicFront")
                             isUserPhotoAdded = data.getBoolean("UserProfilePhoto")

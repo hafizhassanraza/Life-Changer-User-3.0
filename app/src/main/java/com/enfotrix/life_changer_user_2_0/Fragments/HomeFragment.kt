@@ -469,7 +469,7 @@ class HomeFragment : Fragment() {
 
 
 
-        val activeInvestment = user.investment.active_investment
+        val activeInvestment = user!!.investment!!.active_investment
         val profit = user.investment.profit
         val inActiveInvestment = user.investment.in_active_investment
         val ExpextedSum = activeInvestment + inActiveInvestment + profit

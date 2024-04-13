@@ -198,8 +198,8 @@ class ActivityInvestment : AppCompatActivity() {
 
 
 
-                            if(type.equals("Approved")) binding.rvInvestments.adapter= TransactionsAdapter(constants.FROM_APPROVED_INVESTMENT_REQ,transactions)
-                            if(type.equals("Pending")) binding.rvInvestments.adapter= TransactionsAdapter(constants.FROM_PENDING_INVESTMENT_REQ,transactions)
+                            if(status.equals("Approved")) binding.rvInvestments.adapter= TransactionsAdapter(constants.FROM_APPROVED_INVESTMENT_REQ,transactions)
+                            if(status.equals("Pending")) binding.rvInvestments.adapter= TransactionsAdapter(constants.FROM_PENDING_INVESTMENT_REQ,transactions)
 
 
 
