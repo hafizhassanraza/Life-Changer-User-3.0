@@ -62,7 +62,7 @@ class ActivityInvestorAccounts : AppCompatActivity(), InvestorAccountsAdapter.On
         setTitle("My Bank Accounts")
         getUser()
 
-        binding.fbAddInvestorAccount.setOnClickListener { showAddAccountDialog(constants.VALUE_DIALOG_FLOW_NOMINEE_BANK) }
+        binding.fbAddInvestorAccount.setOnClickListener { showAddAccountDialog("user") }
     }
 
     private fun getUser() {
@@ -109,6 +109,7 @@ class ActivityInvestorAccounts : AppCompatActivity(), InvestorAccountsAdapter.On
     }
 
     private fun setData(accountsList: List<ModelBankAccount>) {
+        Toast.makeText(mContext, "calling", Toast.LENGTH_SHORT).show()
         adapter = InvestorAccountsAdapter(constants.FROM_INVESTOR_ACCOUNTS, accountsList, this@ActivityInvestorAccounts)
         binding.rvInvestorAccounts.adapter = adapter
     }
@@ -148,34 +149,35 @@ class ActivityInvestorAccounts : AppCompatActivity(), InvestorAccountsAdapter.On
     private fun addBankAccount(req: ReqAddAccount) {
         utils.startLoadingAnimation()
         val url = "http://192.168.0.103:8000/api/add-account"
-
         val stringRequest = object : StringRequest(
             Request.Method.POST, url,
             Response.Listener { response ->
                 utils.endLoadingAnimation()
-
                 try {
                     val jsonObject = JSONObject(response)
                     if (jsonObject != null) {
                         if (jsonObject.getBoolean("success")) {
-                            Toast.makeText(mContext, "yes", Toast.LENGTH_SHORT).show()
-                            val gson = Gson()
-                            val accountListType = object : TypeToken<List<ModelBankAccount>>() {}.type
-                            val accounts: List<ModelBankAccount> = gson.fromJson(jsonObject.getJSONArray("data").toString(), accountListType)
-                            setData(accounts)
                             dialog.dismiss()
-                            Toast.makeText(mContext, jsonObject.getString("message"), Toast.LENGTH_SHORT).show()
+//                            val gson = Gson()
+//                            val accountListType = object : TypeToken<List<ModelBankAccount>>() {}.type
+//                            val accounts: List<ModelBankAccount> = gson.fromJson(jsonObject.getJSONArray("data").toString(), accountListType)
+//                            setData(accounts)
+//                            Toast.makeText(mContext, jsonObject.getString("message"), Toast.LENGTH_SHORT).show()
+                            getUser()
                         } else {
                             val error = jsonObject.getString("message")
                             Toast.makeText(mContext, error, Toast.LENGTH_SHORT).show()
                         }
                     }
                 } catch (e: JSONException) {
+                    dialog.dismiss()
+
                     e.printStackTrace()
                     Toast.makeText(mContext, e.message.toString(), Toast.LENGTH_SHORT).show()
                 }
             },
             Response.ErrorListener { error ->
+                dialog.dismiss()
                 utils.endLoadingAnimation()
                 Toast.makeText(mContext, "Response: ${error.message}", Toast.LENGTH_SHORT).show()
                 Log.e("VolleyError", "Error: $error")

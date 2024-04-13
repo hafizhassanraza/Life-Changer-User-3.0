@@ -28,7 +28,7 @@
                 android:id="@+id/tvHeader"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Enter previous 6-Digits Pin !"
+                android:text="Enter New  6-Digits Pin !"
                 android:textColor="@color/primary"
                 android:layout_marginHorizontal="20dp"
                 android:layout_marginTop="20dp"
@@ -42,7 +42,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/SecondaryVariant"
                 android:layout_marginHorizontal="20dp"
-                android:text="Set 6-digit code of your account. So, you can update your password"></TextView>
+                android:text="Set 6-digit code of your account. So, you can update your password"/>
 
 
             <GridLayout

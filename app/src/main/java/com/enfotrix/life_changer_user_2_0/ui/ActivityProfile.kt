@@ -93,9 +93,7 @@ class ActivityProfile : AppCompatActivity() {
             editName.setOnClickListener {
                 updateNameDialog()
             }
-            addressLay.setOnClickListener {
-                updateAddressDialog()
-            }
+
             layPhone.setOnClickListener {
                 updatePhone()
             }
@@ -118,28 +116,94 @@ class ActivityProfile : AppCompatActivity() {
         val editBtn = dialog.findViewById<MaterialButton>(R.id.updatePhone)
         phone.text = user_.phone
         editBtn.setOnClickListener {
-            Toast.makeText(mContext, "clicked", Toast.LENGTH_SHORT).show()
+            val phone_ = phone.text.toString().trim()
+            if(phone_.isEmpty()){
+                phone.error = "Please enter Phone number"
+                return@setOnClickListener
+            }
+            else {
+                updatePhoneNumber(phone_)
+            }
         }
         dialog.show()
 
     }
 
-    private fun updateAddressDialog() {
-        Toast.makeText(mContext, "clicked", Toast.LENGTH_SHORT).show()
+    private fun updatePhoneNumber(phone_: String) {
 
-        dialog = Dialog (mContext)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog.setContentView(R.layout.dialog_update_address)
-        val address = dialog.findViewById<TextView>(R.id.address)
-        val editBtn = dialog.findViewById<MaterialButton>(R.id.updateAddress)
-        address.text = user_.address
-        editBtn.setOnClickListener {
-            Toast.makeText(mContext, "clicked", Toast.LENGTH_SHORT).show()
+        utils.startLoadingAnimation()
+        val url = "http://192.168.0.103:8000/api/update-profile"
+        val stringRequest = object : StringRequest(
+            Request.Method.POST, url,
+            Response.Listener { response ->
+                // Handle the response
+                utils.endLoadingAnimation()
+
+                try {
+
+                    val jsonObject = JSONObject(response)
+
+                    if(jsonObject!=null){
+
+                        if(jsonObject.getBoolean("success")==true){
+
+                            val gson = Gson()
+                            val user: ModelUser = gson.fromJson(jsonObject.getJSONObject("data").toString(), ModelUser::class.java)
+                            setData(user)
+                            dialog.dismiss()
+
+                        }
+
+
+                        else if(jsonObject.getBoolean("success")==false) {
+
+                            var error= jsonObject.getString("message")
+                            Toast.makeText(mContext, error, Toast.LENGTH_SHORT).show()
+                        }
+
+
+
+                    }
+
+
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                    Toast.makeText(mContext, e.message.toString(), Toast.LENGTH_SHORT).show()
+                    // Handle JSON parsing error
+                }
+
+
+
+            },
+            Response.ErrorListener { error ->
+                // Handle errors
+                utils.endLoadingAnimation()
+                Toast.makeText(mContext, "Response: ${error.message}", Toast.LENGTH_SHORT).show()
+
+                Log.e("VolleyError", "Error: $error")
+            }) {
+            // Override getParams() to add POST parameters
+            override fun getParams(): MutableMap<String, String> {
+                val params = HashMap<String, String>()
+                params["phone"]=phone_
+                return params
+            }
+            override fun getHeaders(): MutableMap<String, String> {
+                val headers = HashMap<String, String>()
+                headers["Authorization"] =
+                    "Bearer ${sharedPrefManager.getToken()}" // Replace "token" with your actual token
+                return headers
+            }
+
+
         }
-        dialog.show()
+
+
+        Volley.newRequestQueue(mContext).add(stringRequest)
+
 
     }
+
 
 
 
@@ -148,7 +212,6 @@ class ActivityProfile : AppCompatActivity() {
         dialogPinUpdate.setContentView(R.layout.dialog_for_update_pin)
         dialogPinUpdate.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialogPinUpdate.setCancelable(true)
-
         val pin1 = dialogPinUpdate.findViewById<EditText>(R.id.etPin1)
         val pin2 = dialogPinUpdate.findViewById<EditText>(R.id.etPin2)
         val pin3 = dialogPinUpdate.findViewById<EditText>(R.id.etPin3)
@@ -168,25 +231,100 @@ class ActivityProfile : AppCompatActivity() {
 
         btnSetPin.setOnClickListener {
             val completePin = "${pin1.text}${pin2.text}${pin3.text}${pin4.text}${pin5.text}${pin6.text}"
-            if (completePin == sharedPrefManager.getUser().pin) {
-                if (completePin.contains("-")) {
+
+                if (completePin.contains("-")&& completePin.length<6) {
                     Toast.makeText(mContext, "Enter valid pin", Toast.LENGTH_SHORT).show()
                 } else {
-                    startActivity(Intent(mContext,ActivityUpdatePassword::class.java ))
-                    finish()
+                    updatePin(completePin)
 
-                }
-            } else {
-                Toast.makeText(mContext, "Invalid password, try another", Toast.LENGTH_SHORT).show()
+
             }
         }
 
         dialogPinUpdate.show()
     }
 
+    private fun updatePin(completePin: String) {
+
+        Toast.makeText(mContext, "comlete pin", Toast.LENGTH_SHORT).show()
+        utils.startLoadingAnimation()
+        val url = "http://192.168.0.103:8000/api/update-profile"
+        val stringRequest = object : StringRequest(
+            Request.Method.POST, url,
+            Response.Listener { response ->
+                // Handle the response
+                utils.endLoadingAnimation()
+
+                try {
+
+                    val jsonObject = JSONObject(response)
+
+                    if(jsonObject!=null){
+
+                        if(jsonObject.getBoolean("success")==true){
+
+                            val gson = Gson()
+                            val user: ModelUser = gson.fromJson(jsonObject.getJSONObject("data").toString(), ModelUser::class.java)
+                            setData(user)
+                            dialogPinUpdate.dismiss()
+
+                        }
+
+
+                        else if(jsonObject.getBoolean("success")==false) {
+
+                            var error= jsonObject.getString("message")
+                            Toast.makeText(mContext, error, Toast.LENGTH_SHORT).show()
+                        }
+
+
+
+                    }
+
+
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                    Toast.makeText(mContext, e.message.toString(), Toast.LENGTH_SHORT).show()
+                    // Handle JSON parsing error
+                }
+
+
+
+            },
+            Response.ErrorListener { error ->
+                // Handle errors
+                utils.endLoadingAnimation()
+                Toast.makeText(mContext, "Response: ${error.message}", Toast.LENGTH_SHORT).show()
+
+                Log.e("VolleyError", "Error: $error")
+            }) {
+            // Override getParams() to add POST parameters
+            override fun getParams(): MutableMap<String, String> {
+                val params = HashMap<String, String>()
+                params["pin"]=completePin
+                return params
+            }
+            override fun getHeaders(): MutableMap<String, String> {
+                val headers = HashMap<String, String>()
+                headers["Authorization"] =
+                    "Bearer ${sharedPrefManager.getToken()}" // Replace "token" with your actual token
+                return headers
+            }
+
+
+        }
+
+
+        Volley.newRequestQueue(mContext).add(stringRequest)
+
+
+
+
+    }
+
 
     private fun setData(user: ModelUser) {
-
+        Toast.makeText(mContext, "yes", Toast.LENGTH_SHORT).show()
         Glide.with(mContext).load(sharedPrefManager.getUser().photo).centerCrop()
             .placeholder(R.drawable.ic_launcher_background).into(binding.imgUser);
         binding.tvUserName.text = user.name
@@ -194,7 +332,6 @@ class ActivityProfile : AppCompatActivity() {
         binding.tvAddress.text = user.address
         binding.tvFatherName.text = user.father_name
         binding.tvPhoneNumber.text = user.phone
-
         binding.tvNomineeName.text = user.nominees.name
         binding.tvNomineeFatherName.text = user.nominees.father_name
         binding.tvNomineeCnic.text = user.nominees.cnic
@@ -202,6 +339,85 @@ class ActivityProfile : AppCompatActivity() {
     }
 
 
+    private fun updateData(userName: String, address: String, fatherName: String) {
+        utils.startLoadingAnimation()
+        val url = "http://192.168.0.103:8000/api/update-profile"
+        val stringRequest = object : StringRequest(
+            Request.Method.POST, url,
+            Response.Listener { response ->
+                // Handle the response
+                utils.endLoadingAnimation()
+
+                try {
+
+                    val jsonObject = JSONObject(response)
+
+                    if(jsonObject!=null){
+
+                        if(jsonObject.getBoolean("success")==true){
+
+                            val gson = Gson()
+                            val user: ModelUser = gson.fromJson(jsonObject.getJSONObject("data").toString(), ModelUser::class.java)
+                            setData(user)
+
+
+                            dialog.dismiss()
+
+                        }
+
+
+                        else if(jsonObject.getBoolean("success")==false) {
+
+                            var error= jsonObject.getString("message")
+                            Toast.makeText(mContext, error, Toast.LENGTH_SHORT).show()
+                        }
+
+
+
+                    }
+
+
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                    Toast.makeText(mContext, e.message.toString(), Toast.LENGTH_SHORT).show()
+                    // Handle JSON parsing error
+                }
+
+
+
+            },
+            Response.ErrorListener { error ->
+                // Handle errors
+                utils.endLoadingAnimation()
+                Toast.makeText(mContext, "Response: ${error.message}", Toast.LENGTH_SHORT).show()
+
+                Log.e("VolleyError", "Error: $error")
+            }) {
+            // Override getParams() to add POST parameters
+            override fun getParams(): MutableMap<String, String> {
+                val params = HashMap<String, String>()
+                params["name"] = userName
+                params["father_name"] = fatherName
+                params["address"] = address
+                return params
+            }
+            override fun getHeaders(): MutableMap<String, String> {
+                val headers = HashMap<String, String>()
+                headers["Authorization"] =
+                    "Bearer ${sharedPrefManager.getToken()}" // Replace "token" with your actual token
+                return headers
+            }
+
+
+        }
+
+
+        Volley.newRequestQueue(mContext).add(stringRequest)
+
+
+
+
+    }
 
     fun updateNameDialog() {
         dialog = Dialog(mContext)
@@ -211,12 +427,41 @@ class ActivityProfile : AppCompatActivity() {
 
         val etUserName = dialog.findViewById<EditText>(R.id.name)
         val etFatherName = dialog.findViewById<EditText>(R.id.fatherName)
+        val address = dialog.findViewById<EditText>(R.id.address)
         val btnUpdateName = dialog.findViewById<Button>(R.id.updateName)
         etUserName.setText(user_.name)
         etFatherName.setText(user_.father_name)
-        btnUpdateName.setOnClickListener{
-            Toast.makeText(mContext, "clicked", Toast.LENGTH_SHORT).show()
+        address.setText(user_.address)
+        btnUpdateName.setOnClickListener {
+            val userName = etUserName.text.toString().trim()
+            val fatherName = etFatherName.text.toString().trim()
+            val userAddress = address.text.toString().trim()
+
+            if (userName.isEmpty()) {
+                etUserName.error = "Please enter your name"
+                return@setOnClickListener
+            }
+
+            else if (fatherName.isEmpty()) {
+                etFatherName.error = "Please enter your father's name"
+                return@setOnClickListener
+            }
+
+            else if (userAddress.isEmpty()) {
+                address.error = "Please enter your address"
+                return@setOnClickListener
+            }
+            else {
+
+                updateData(userName,userAddress,fatherName)
+
+            }
+//
+//            // All fields are valid, display the entered data in a toast message
+//            val toastMessage = "Name: $userName\nFather's Name: $fatherName\nAddress: $userAddress"
+//            Toast.makeText(mContext, toastMessage, Toast.LENGTH_SHORT).show()
         }
+
         dialog.show()
     }
 
@@ -265,10 +510,7 @@ class ActivityProfile : AppCompatActivity() {
                     if (jsonObject != null) {
 
                         if (jsonObject.getBoolean("success") == true) {
-
-
                             val gson = Gson()
-
                             val user: ModelUser = gson.fromJson(jsonObject.getJSONObject("data").toString(), ModelUser::class.java)
                             user_=user
 
@@ -276,7 +518,7 @@ class ActivityProfile : AppCompatActivity() {
                             sharedPrefManager.setLoginStatus(user.status)
                             sharedPrefManager.saveUser(user)
 
-                            //setData(user!!)
+                            setData(user!!)
 
 
                         } else if (jsonObject.getBoolean("success") == false) {
@@ -301,7 +543,6 @@ class ActivityProfile : AppCompatActivity() {
                 // Handle errors
                 utils.endLoadingAnimation()
                 Toast.makeText(mContext, "Response: ${error.message}", Toast.LENGTH_SHORT).show()
-
                 Log.e("VolleyError", "Error: $error")
             }) {
 
