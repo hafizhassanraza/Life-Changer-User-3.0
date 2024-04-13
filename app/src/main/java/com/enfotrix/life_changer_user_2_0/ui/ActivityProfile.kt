@@ -24,7 +24,6 @@ import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
 import com.enfotrix.life_changer_user_2_0.Constants
 import com.enfotrix.life_changer_user_2_0.Data.Repo
-import com.enfotrix.life_changer_user_2_0.Models.ModelNominee
 import com.enfotrix.life_changer_user_2_0.Models.ModelUser
 import com.enfotrix.life_changer_user_2_0.Models.UserViewModel
 import com.enfotrix.life_changer_user_2_0.R
@@ -277,7 +276,7 @@ class ActivityProfile : AppCompatActivity() {
                             sharedPrefManager.setLoginStatus(user.status)
                             sharedPrefManager.saveUser(user)
 
-                            setData(user)
+                            //setData(user!!)
 
 
                         } else if (jsonObject.getBoolean("success") == false) {
@@ -396,95 +395,6 @@ class ActivityProfile : AppCompatActivity() {
             override fun getParams(): MutableMap<String, String> {
                 val params = HashMap<String, String>()
                 params["name"] = "test 123"
-                return params
-            }
-            override fun getHeaders(): MutableMap<String, String> {
-                val headers = HashMap<String, String>()
-                headers["Authorization"] =
-                    "Bearer ${sharedPrefManager.getToken()}" // Replace "token" with your actual token
-                return headers
-            }
-
-
-        }
-
-
-        Volley.newRequestQueue(mContext).add(stringRequest)
-
-
-    }
-
-    private fun updateNominee(nominee: ModelNominee) {
-
-
-
-        utils.startLoadingAnimation()
-        val url = "http://192.168.0.103:8000/api/update-nominee"
-
-        val stringRequest = object : StringRequest(
-            Request.Method.POST, url,
-            Response.Listener { response ->
-                // Handle the response
-                utils.endLoadingAnimation()
-
-                try {
-
-                    val jsonObject = JSONObject(response)
-
-                    if(jsonObject!=null){
-
-                        if(jsonObject.getBoolean("success")==true){
-
-
-
-                            getUser()
-
-
-                            dialog.dismiss()
-                            Toast.makeText(mContext, constants.INVESTOR_SIGNUP_MESSAGE, Toast.LENGTH_SHORT).show()
-                            startActivity(Intent(mContext,ActivityUserDetails::class.java)
-                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK))
-                            finish()
-
-                        }
-
-
-                        else if(jsonObject.getBoolean("success")==false) {
-
-                            var error= jsonObject.getString("message")
-                            Toast.makeText(mContext, error, Toast.LENGTH_SHORT).show()
-                        }
-
-
-
-                    }
-
-
-                } catch (e: JSONException) {
-                    e.printStackTrace()
-                    Toast.makeText(mContext, e.message.toString(), Toast.LENGTH_SHORT).show()
-                    // Handle JSON parsing error
-                }
-
-
-
-            },
-            Response.ErrorListener { error ->
-                // Handle errors
-                utils.endLoadingAnimation()
-                Toast.makeText(mContext, "Response: ${error.message}", Toast.LENGTH_SHORT).show()
-
-                Log.e("VolleyError", "Error: $error")
-            }) {
-            // Override getParams() to add POST parameters
-            override fun getParams(): MutableMap<String, String> {
-                val params = HashMap<String, String>()
-                params["name"] = nominee.name
-                params["father_name"] =nominee.father_name
-                params["cnic"] = nominee.cnic
-                params["address"] = nominee.address
-                params["user_relation"] = nominee.user_relation
-                params["phone"] = nominee.phone
                 return params
             }
             override fun getHeaders(): MutableMap<String, String> {
