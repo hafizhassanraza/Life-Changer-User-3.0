@@ -553,19 +553,20 @@ class HomeFragment : Fragment() {
 
 
 
+        val activeInvestment = user?.investment?.active_investment ?: 0
+        val profit = user?.investment?.profit ?: 0
+        val inActiveInvestment = user?.investment?.in_active_investment ?: 0
+        val expectedSum = activeInvestment + inActiveInvestment + profit
 
-        val activeInvestment = user!!.investment!!.active_investment
-        val profit = user.investment.profit
-        val inActiveInvestment = user.investment.in_active_investment
-        val ExpextedSum = activeInvestment + inActiveInvestment + profit
 
         binding.tvBalance.text = activeInvestment.toString()
         binding.availableProfit.text = profit.toString()
         binding.tvInActiveInvestment.text = inActiveInvestment.toString()
-        binding.tvExpectedSum.text = ExpextedSum.toString()
+        binding.tvExpectedSum.text = expectedSum.toString() // Corrected variable name
+
 
         Glide.with(mContext)
-            .load(user.photo)
+            .load(user!!.photo)
             .centerCrop()
             .placeholder(R.drawable.profile_person_icon) // Placeholder image while loading
             .into(binding.imageView)

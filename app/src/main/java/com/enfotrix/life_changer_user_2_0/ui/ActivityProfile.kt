@@ -10,7 +10,7 @@ import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
+import android.util.Log
 import android.view.Window
 import android.widget.Button
 import android.widget.EditText
@@ -19,22 +19,25 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
+import com.android.volley.Request
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
 import com.enfotrix.life_changer_user_2_0.Constants
 import com.enfotrix.life_changer_user_2_0.Data.Repo
-import com.enfotrix.life_changer_user_2_0.Models.ModelAnnouncement
-import com.enfotrix.life_changer_user_2_0.Models.ModelBankAccount
-import com.enfotrix.life_changer_user_2_0.Models.ModelFA
+import com.enfotrix.life_changer_user_2_0.Models.ModelUser
 import com.enfotrix.life_changer_user_2_0.Models.UserViewModel
 import com.enfotrix.life_changer_user_2_0.R
 import com.enfotrix.life_changer_user_2_0.SharedPrefManager
 import com.enfotrix.life_changer_user_2_0.Utils
 import com.enfotrix.life_changer_user_2_0.databinding.ActivityProfileBinding
+import com.google.android.material.button.MaterialButton
 import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
+import com.google.gson.Gson
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
+import org.json.JSONException
+import org.json.JSONObject
 
 class ActivityProfile : AppCompatActivity() {
 
@@ -49,7 +52,8 @@ class ActivityProfile : AppCompatActivity() {
     private lateinit var repo: Repo
 
 
-    private lateinit var user: User
+
+    private lateinit var user_: ModelUser
     private lateinit var sharedPrefManager: SharedPrefManager
     private lateinit var dialog: Dialog
 
@@ -65,42 +69,184 @@ class ActivityProfile : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        mContext=this@ActivityProfile
-        repo= Repo(mContext)
-        utils = Utils(mContext)
-        constants= Constants()
-        sharedPrefManager=SharedPrefManager(mContext)
 
-        binding.layInvestorAccount.setOnClickListener {
-            startActivity(Intent(mContext, ActivityInvestorAccounts::class.java))
-        }
-        /*binding.layLogut.setOnClickListener { task ->
-            showDialog()
-        }*/
-
-        binding.imgUser.setOnClickListener {
-            //Toast.makeText(mContext, "Available soon", Toast.LENGTH_SHORT).show()
-            openGallery()
-        }
-
+        // Initialize context, repository, utils, constants, and shared preferences manager
+        mContext = this@ActivityProfile
+        repo = Repo(mContext)
         utils = Utils(mContext)
         constants = Constants()
         sharedPrefManager = SharedPrefManager(mContext)
-        //investor=sharedPrefManager.getUser()
-        setimage()
-        binding.layPin.setOnClickListener {
-            showUpdatePinDialog()
-        }
-        binding.editName.setOnClickListener {
-            updateNameDialog()
+
+        // Fetch user data
+        getUser()
+
+        // Set click listeners for various UI elements
+        binding.apply {
+            layInvestorAccount.setOnClickListener {
+                startActivity(Intent(mContext, ActivityInvestorAccounts::class.java))
+            }
+            imgUser.setOnClickListener {
+                openGallery()
+            }
+            layPin.setOnClickListener {
+                showUpdatePinDialog()
+            }
+            editName.setOnClickListener {
+                updateNameDialog()
+            }
+            addressLay.setOnClickListener {
+                updateAddressDialog()
+            }
+            layPhone.setOnClickListener {
+                updatePhone()
+            }
+            layNominee.setOnClickListener {
+                val intent = Intent(mContext, ActivityEditNominee::class.java)
+                val userJson = Gson().toJson(user_)
+                intent.putExtra("user_model", userJson)
+                startActivity(intent)
+            }
         }
 
+        // Set user profile image and check for additional data
+        setimage()
         checkData()
-        setData()
+    }
+
+    private fun updatePhone() {
+        dialog = Dialog (mContext)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.setContentView(R.layout.update_phone_number)
+        val phone = dialog.findViewById<TextView>(R.id.phoneNumber)
+        val editBtn = dialog.findViewById<MaterialButton>(R.id.updatePhone)
+        phone.text = user_.phone
+        editBtn.setOnClickListener {
+            Toast.makeText(mContext, "clicked", Toast.LENGTH_SHORT).show()
+        }
+        dialog.show()
+
+    }
+
+    private fun updateAddressDialog() {
+        Toast.makeText(mContext, "clicked", Toast.LENGTH_SHORT).show()
+
+        dialog = Dialog (mContext)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.setContentView(R.layout.dialog_update_address)
+        val address = dialog.findViewById<TextView>(R.id.address)
+        val editBtn = dialog.findViewById<MaterialButton>(R.id.updateAddress)
+        address.text = user_.address
+        editBtn.setOnClickListener {
+            Toast.makeText(mContext, "clicked", Toast.LENGTH_SHORT).show()
+        }
+        dialog.show()
+
+    }
+
+
+    private fun getUser() {
+
+
+        val url = "http://192.168.0.103:8000/api/user-data"
+
+        val stringRequest = object : StringRequest(
+            Request.Method.POST, url,
+            com.android.volley.Response.Listener { response ->
+                // Handle the response
+                utils.endLoadingAnimation()
+
+                try {
+
+                    val jsonObject = JSONObject(response)
+
+                    if (jsonObject != null) {
+
+                        if (jsonObject.getBoolean("success") == true) {
+
+
+                            val gson = Gson()
+
+                            val user: ModelUser = gson.fromJson(jsonObject.getJSONObject("data").toString(), ModelUser::class.java)
+                            user_=user
+
+                            Toast.makeText(mContext, user.toString(), Toast.LENGTH_SHORT).show()
+                            sharedPrefManager.setLoginStatus(user.status)
+                            sharedPrefManager.saveUser(user)
+
+                            setData(user!!)
+
+
+                        } else if (jsonObject.getBoolean("success") == false) {
+
+                            var error = jsonObject.getString("message")
+                            Toast.makeText(mContext, " ${error}", Toast.LENGTH_SHORT).show()
+                        }
+
+                    }
+
+
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                    utils.endLoadingAnimation()
+                    Toast.makeText(mContext, e.message.toString(), Toast.LENGTH_SHORT).show()
+                    // Handle JSON parsing error
+                }
+
+
+            },
+            com.android.volley.Response.ErrorListener { error ->
+                // Handle errors
+                utils.endLoadingAnimation()
+                Toast.makeText(mContext, "Response: ${error.message}", Toast.LENGTH_SHORT).show()
+
+                Log.e("VolleyError", "Error: $error")
+            }) {
+
+            override fun getHeaders(): MutableMap<String, String> {
+                val headers = HashMap<String, String>()
+                headers["Authorization"] =
+                    "Bearer ${sharedPrefManager.getToken()}" // Replace "token" with your actual token
+                return headers
+            }
+
+
+        }
+
+
+        Volley.newRequestQueue(mContext).add(stringRequest)
+
 
 
 
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     fun openGallery() {
         val intent = Intent(Intent.ACTION_PICK)
@@ -129,19 +275,23 @@ class ActivityProfile : AppCompatActivity() {
 
 
 
-    fun updateNameDialog(){
-
-        dialog = Dialog (mContext)
+    fun updateNameDialog() {
+        dialog = Dialog(mContext)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.setContentView(R.layout.dialog_update_name)
-        val userName = dialog.findViewById<TextView>(R.id.name)
-        val fatherName = dialog.findViewById<TextView>(R.id.fatherName)
-        val editBtn = dialog.findViewById<Spinner>(R.id.spBank)
+
+        val etUserName = dialog.findViewById<EditText>(R.id.name)
+        val etFatherName = dialog.findViewById<EditText>(R.id.fatherName)
+        val btnUpdateName = dialog.findViewById<Button>(R.id.updateName)
+        etUserName.setText(user_.name)
+        etFatherName.setText(user_.father_name)
+        btnUpdateName.setOnClickListener{
+            Toast.makeText(mContext, "clicked", Toast.LENGTH_SHORT).show()
+        }
         dialog.show()
-
-
     }
+
 
 
 
@@ -225,32 +375,32 @@ class ActivityProfile : AppCompatActivity() {
                 }
         }*/
 
-        db.collection(constants.ANNOUNCEMENT_COLLECTION).document("Rx3xDtgwOH7hMdWxkf94")
-            .addSnapshotListener { snapshot, firebaseFirestoreException ->
-                firebaseFirestoreException?.let {
-                    Toast.makeText(mContext, it.message.toString(), Toast.LENGTH_SHORT).show()
-                    return@addSnapshotListener
-                }
-
-                snapshot?.let { document ->
-                    val announcement = document.toObject<ModelAnnouncement>()
-                    if (announcement != null) {
-                        sharedPrefManager.putAnnouncement(announcement)
-                        setData()
-                    }
-                }
-            }
+//        db.collection(constants.ANNOUNCEMENT_COLLECTION).document("Rx3xDtgwOH7hMdWxkf94")
+//            .addSnapshotListener { snapshot, firebaseFirestoreException ->
+//                firebaseFirestoreException?.let {
+//                    Toast.makeText(mContext, it.message.toString(), Toast.LENGTH_SHORT).show()
+//                    return@addSnapshotListener
+//                }
+//
+//                snapshot?.let { document ->
+//                    val announcement = document.toObject<ModelAnnouncement>()
+//                    if (announcement != null) {
+//                        sharedPrefManager.putAnnouncement(announcement)
+//                        setData()
+//                    }
+//                }
+//            }
     }
 
-    private fun setData() {
-        Glide.with(mContext).load(sharedPrefManager.getUser().photo).centerCrop()
+    private fun setData(user: ModelUser) {
+        Glide.with(mContext).load(user!!.photo).centerCrop()
             .placeholder(R.drawable.ic_launcher_background).into(binding.imgUser);
-        binding.tvUserName.text = sharedPrefManager.getUser().name
-        binding.tvCNIC.text = sharedPrefManager.getUser().cnic
-        binding.tvAddress.text = sharedPrefManager.getUser().address
-        binding.tvFatherName.text = sharedPrefManager.getUser().father_name
-        Toast.makeText(mContext, "father::"+sharedPrefManager.getUser().father_name.toString(), Toast.LENGTH_SHORT).show()
-        binding.tvPhoneNumber.text = sharedPrefManager.getUser().phone
+        binding.tvUserName.text = user!!.name
+        binding.tvCNIC.text = user.cnic
+        binding.tvAddress.text = user.address
+        binding.tvFatherName.text = user.father_name
+        //Toast.makeText(mContext, "name :"+user.father_name , Toast.LENGTH_SHORT).show()
+        binding.tvPhoneNumber.text = user.phone
 
         /*binding.tvNomineeName.text = sharedPrefManager.getNominee().firstName
         binding.tvNomineeFatherName.text = sharedPrefManager.getNominee().lastName

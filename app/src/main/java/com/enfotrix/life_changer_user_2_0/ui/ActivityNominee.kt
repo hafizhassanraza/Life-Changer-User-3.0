@@ -46,7 +46,6 @@ class ActivityNominee : AppCompatActivity() {
         repo= Repo(mContext)
         utils = Utils(mContext)
         constants= Constants()
-        sharedPrefManager = SharedPrefManager(mContext)
 
 
 
