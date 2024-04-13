@@ -28,6 +28,7 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
 import com.enfotrix.life_changer_user_2_0.Adapters.InvestorAccountsAdapter
+import com.enfotrix.life_changer_user_2_0.ApiUrls
 import com.enfotrix.life_changer_user_2_0.Constants
 import com.enfotrix.life_changer_user_2_0.Models.InvestmentViewModel
 import com.enfotrix.life_changer_user_2_0.Models.ModelBankAccount
@@ -132,10 +133,9 @@ class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.On
 
 
         utils.startLoadingAnimation()
-        val url = "http://192.168.0.103:8000/api/user-data"
 
         val stringRequest = object : StringRequest(
-            Request.Method.POST, url,
+            Request.Method.POST, ApiUrls.USER_DATA_API,
             com.android.volley.Response.Listener { response ->
                 // Handle the response
                 utils.endLoadingAnimation()
@@ -213,10 +213,9 @@ class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.On
 
 
         utils.startLoadingAnimation()
-        val url = "http://192.168.0.103:8000/api/admin-account"
 
         val stringRequest = object : StringRequest(
-            Request.Method.POST, url,
+            Request.Method.POST, ApiUrls.ADMIN_ACCOUNTS_API,
             com.android.volley.Response.Listener { response ->
                 // Handle the response
                 utils.endLoadingAnimation()
@@ -445,9 +444,8 @@ class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.On
 
     fun updateInvestorBankList(modelBankAccount: ReqAddAccount) {
         utils.startLoadingAnimation()
-        val url = "http://192.168.0.103:8000/api/add-account"
         val stringRequest = object : StringRequest(
-            Request.Method.POST, url,
+            Request.Method.POST, ApiUrls.ADD_ACCOUNTS_API,
             Response.Listener { response ->
                 utils.endLoadingAnimation()
                 try {
@@ -496,16 +494,9 @@ class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.On
     }
 
     fun addInvestmentReq() {
-
-
-
-
-
         utils.startLoadingAnimation()
-        val url = "http://192.168.0.103:8000/api/add-transaction"
-
         val stringRequest = object : StringRequest(
-            Request.Method.POST, url,
+            Request.Method.POST, ApiUrls.ADD_TRANSACTION_API,
             Response.Listener { response ->
                 // Handle the response
                 utils.endLoadingAnimation()

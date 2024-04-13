@@ -22,6 +22,7 @@ import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
+import com.enfotrix.life_changer_user_2_0.ApiUrls
 import com.enfotrix.life_changer_user_2_0.Constants
 import com.enfotrix.life_changer_user_2_0.Data.Repo
 import com.enfotrix.life_changer_user_2_0.Models.ModelUser
@@ -132,9 +133,8 @@ class ActivityProfile : AppCompatActivity() {
     private fun updatePhoneNumber(phone_: String) {
 
         utils.startLoadingAnimation()
-        val url = "http://192.168.0.103:8000/api/update-profile"
         val stringRequest = object : StringRequest(
-            Request.Method.POST, url,
+            Request.Method.POST, ApiUrls.UPDATE_PROFILE_API,
             Response.Listener { response ->
                 // Handle the response
                 utils.endLoadingAnimation()
@@ -246,11 +246,9 @@ class ActivityProfile : AppCompatActivity() {
 
     private fun updatePin(completePin: String) {
 
-        Toast.makeText(mContext, "comlete pin", Toast.LENGTH_SHORT).show()
         utils.startLoadingAnimation()
-        val url = "http://192.168.0.103:8000/api/update-profile"
         val stringRequest = object : StringRequest(
-            Request.Method.POST, url,
+            Request.Method.POST, ApiUrls.UPDATE_PROFILE_API,
             Response.Listener { response ->
                 // Handle the response
                 utils.endLoadingAnimation()
@@ -341,9 +339,8 @@ class ActivityProfile : AppCompatActivity() {
 
     private fun updateData(userName: String, address: String, fatherName: String) {
         utils.startLoadingAnimation()
-        val url = "http://192.168.0.103:8000/api/update-profile"
         val stringRequest = object : StringRequest(
-            Request.Method.POST, url,
+            Request.Method.POST, ApiUrls.UPDATE_PROFILE_API,
             Response.Listener { response ->
                 // Handle the response
                 utils.endLoadingAnimation()
@@ -497,10 +494,9 @@ class ActivityProfile : AppCompatActivity() {
     private fun getUser() {
 
 
-        val url = "http://192.168.0.103:8000/api/user-data"
 
         val stringRequest = object : StringRequest(
-            Request.Method.POST, url,
+            Request.Method.POST, ApiUrls.USER_DATA_API,
             com.android.volley.Response.Listener { response ->
                 // Handle the response
                 utils.endLoadingAnimation()
@@ -575,10 +571,9 @@ class ActivityProfile : AppCompatActivity() {
 
 
         utils.startLoadingAnimation()
-        val url = "http://192.168.0.103:8000/api/update-profile"
 
         val stringRequest = object : StringRequest(
-            Request.Method.POST, url,
+            Request.Method.POST, ApiUrls.UPDATE_PROFILE_API,
             Response.Listener { response ->
                 // Handle the response
                 utils.endLoadingAnimation()

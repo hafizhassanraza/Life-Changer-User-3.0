@@ -21,6 +21,7 @@ import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.enfotrix.life_changer_user_2_0.Adapters.InvestorAccountsAdapter
+import com.enfotrix.life_changer_user_2_0.ApiUrls
 import com.enfotrix.life_changer_user_2_0.Constants
 import com.enfotrix.life_changer_user_2_0.Models.ModelBankAccount
 import com.enfotrix.life_changer_user_2_0.Models.ModelUser
@@ -67,10 +68,9 @@ class ActivityInvestorAccounts : AppCompatActivity(), InvestorAccountsAdapter.On
 
     private fun getUser() {
         utils.startLoadingAnimation()
-        val url = "http://192.168.0.103:8000/api/user-data"
 
         val stringRequest = object : StringRequest(
-            Request.Method.POST, url,
+            Request.Method.POST, ApiUrls.USER_DATA_API,
             Response.Listener { response ->
                 utils.endLoadingAnimation()
 
@@ -148,9 +148,8 @@ class ActivityInvestorAccounts : AppCompatActivity(), InvestorAccountsAdapter.On
 
     private fun addBankAccount(req: ReqAddAccount) {
         utils.startLoadingAnimation()
-        val url = "http://192.168.0.103:8000/api/add-account"
         val stringRequest = object : StringRequest(
-            Request.Method.POST, url,
+            Request.Method.POST, ApiUrls.ADD_ACCOUNTS_API,
             Response.Listener { response ->
                 utils.endLoadingAnimation()
                 try {

@@ -24,6 +24,7 @@ import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.enfotrix.life_changer_user_2_0.Adapters.InvestorAccountsAdapter
+import com.enfotrix.life_changer_user_2_0.ApiUrls
 import com.enfotrix.life_changer_user_2_0.Constants
 import com.enfotrix.life_changer_user_2_0.Models.InvestmentViewModel
 import com.enfotrix.life_changer_user_2_0.Models.ModelBankAccount
@@ -127,10 +128,9 @@ class ActivityNewWithdrawReq : AppCompatActivity(), InvestorAccountsAdapter.OnIt
 
 
         utils.startLoadingAnimation()
-        val url = "http://192.168.0.103:8000/api/add-transaction"
 
         val stringRequest = object : StringRequest(
-            Request.Method.POST, url,
+            Request.Method.POST, ApiUrls.ADD_TRANSACTION_API,
             Response.Listener { response ->
                 // Handle the response
                 utils.endLoadingAnimation()
@@ -147,9 +147,7 @@ class ActivityNewWithdrawReq : AppCompatActivity(), InvestorAccountsAdapter.OnIt
                             Toast.makeText(mContext, "Investment Req. Sent!", Toast.LENGTH_SHORT)
                                 .show()
                             startActivity(
-                                Intent(mContext, MainActivity::class.java)
-                                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
-                            )
+                                Intent(mContext, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK))
                             finish()
 
                         } else if (jsonObject.getBoolean("success") == false) {
@@ -205,10 +203,9 @@ class ActivityNewWithdrawReq : AppCompatActivity(), InvestorAccountsAdapter.OnIt
 
 
         utils.startLoadingAnimation()
-        val url = "http://192.168.0.103:8000/api/user-data"
 
         val stringRequest = object : StringRequest(
-            Request.Method.POST, url,
+            Request.Method.POST, ApiUrls.USER_DATA_API,
             com.android.volley.Response.Listener { response ->
                 // Handle the response
                 utils.endLoadingAnimation()
@@ -306,9 +303,8 @@ class ActivityNewWithdrawReq : AppCompatActivity(), InvestorAccountsAdapter.OnIt
 
     fun updateInvestorBankList(modelBankAccount: ReqAddAccount) {
         utils.startLoadingAnimation()
-        val url = "http://192.168.0.103:8000/api/add-account"
         val stringRequest = object : StringRequest(
-            Request.Method.POST, url,
+            Request.Method.POST, ApiUrls.ADMIN_ACCOUNTS_API,
             Response.Listener { response ->
                 utils.endLoadingAnimation()
                 try {

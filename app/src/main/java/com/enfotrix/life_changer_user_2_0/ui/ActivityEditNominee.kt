@@ -11,6 +11,7 @@ import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.enfotrix.life_changer_user_2_0.ApiUrls
 import com.enfotrix.life_changer_user_2_0.Constants
 import com.enfotrix.life_changer_user_2_0.Data.Repo
 import com.enfotrix.life_changer_user_2_0.Models.ModelNominee
@@ -111,10 +112,10 @@ class ActivityEditNominee : AppCompatActivity() {
     }
 
     private fun getUser() {
-        val url = "http://192.168.0.103:8000/api/user-data"
+
 
         val stringRequest = object : StringRequest(
-            Request.Method.POST, url,
+            Request.Method.POST, ApiUrls.USER_DATA_API,
             { response ->
                 utils.endLoadingAnimation()
                 try {
@@ -154,11 +155,9 @@ class ActivityEditNominee : AppCompatActivity() {
 
     private fun updateNominee(nominee: ModelNominee) {
 
-        Toast.makeText(mContext, "comlete pin", Toast.LENGTH_SHORT).show()
         utils.startLoadingAnimation()
-        val url = "http://192.168.0.103:8000/api/update-nominee"
         val stringRequest = object : StringRequest(
-            Request.Method.POST, url,
+            Request.Method.POST, ApiUrls.UPDATE_NOMINEE_API,
             Response.Listener { response ->
                 // Handle the response
                 utils.endLoadingAnimation()

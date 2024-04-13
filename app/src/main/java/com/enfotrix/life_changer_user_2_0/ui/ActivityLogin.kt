@@ -26,6 +26,7 @@ import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.enfotrix.life_changer_user_2_0.ApiUrls
 import com.enfotrix.life_changer_user_2_0.Constants
 import com.enfotrix.life_changer_user_2_0.Models.ModelBankAccount
 import com.enfotrix.life_changer_user_2_0.Models.ModelNominee
@@ -200,10 +201,8 @@ class ActivityLogin : AppCompatActivity() {
 
 
         utils.startLoadingAnimation()
-        val url = "http://192.168.0.103:8000/api/login"
-
         val stringRequest = object : StringRequest(
-            Request.Method.POST, url,
+            Request.Method.POST, ApiUrls.LOGIN_API,
             Response.Listener { response ->
                 // Handle the response
                 utils.endLoadingAnimation()
@@ -411,15 +410,8 @@ class ActivityLogin : AppCompatActivity() {
     private fun checkCNIC(cnic:String) {
 
 
-
-
-
-
-
-        val url = "http://192.168.0.103:8000/api/cnic-validator"
-
         val stringRequest = object : StringRequest(
-            Request.Method.POST, url,
+            Request.Method.POST, ApiUrls.CNIC_VALIDATOR_API,
             Response.Listener { response ->
                 // Handle the response
                 utils.endLoadingAnimation()

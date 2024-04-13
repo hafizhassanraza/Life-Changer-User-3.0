@@ -20,6 +20,7 @@ import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
+import com.enfotrix.life_changer_user_2_0.ApiUrls
 import com.enfotrix.life_changer_user_2_0.Constants
 import com.enfotrix.life_changer_user_2_0.Models.InvestmentViewModel
 import com.enfotrix.life_changer_user_2_0.Models.ModelUser
@@ -193,10 +194,9 @@ class HomeFragment : Fragment() {
 
 
         utils.startLoadingAnimation()
-        val url = "http://192.168.0.103:8000/api/user-data"
 
         val stringRequest = object : StringRequest(
-            Request.Method.POST, url,
+            Request.Method.POST, ApiUrls.USER_DATA_API,
             com.android.volley.Response.Listener { response ->
                 // Handle the response
                 utils.endLoadingAnimation()
@@ -272,10 +272,9 @@ class HomeFragment : Fragment() {
 
 
         utils.startLoadingAnimation()
-        val url = "http://192.168.0.103:8000/api/announcement"
 
         val stringRequest = object : StringRequest(
-            Request.Method.POST, url,
+            Request.Method.POST, ApiUrls.ANNOUNCEMENT_API,
             com.android.volley.Response.Listener { response ->
                 // Handle the response
                 utils.endLoadingAnimation()
