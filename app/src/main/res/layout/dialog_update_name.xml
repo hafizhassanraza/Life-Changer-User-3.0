@@ -29,7 +29,7 @@
                 android:id="@+id/tvHeaderBank"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Edit Your Name"
+                android:text="Edit Your Personal Info"
                 android:textColor="@color/black_m"
                 android:layout_marginHorizontal="20dp"
                 android:layout_marginTop="20dp"
@@ -60,7 +60,7 @@
                 android:layout_marginTop="10dp"
                 android:background="@drawable/bg_edittext"
 
-                android:hint="-------"
+                android:hint="Enter your Name"
                 android:paddingLeft="20dp" />
             <TextView
                 android:layout_width="wrap_content"
@@ -76,7 +76,7 @@
                 android:layout_marginHorizontal="20dp"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/bg_edittext"
-                android:hint="-------"
+                android:hint="Enter your father Name"
                 android:paddingLeft="20dp" />
             <TextView
                 android:layout_width="wrap_content"
@@ -92,7 +92,7 @@
                 android:layout_marginHorizontal="20dp"
                 android:layout_marginTop="8dp"
                 android:background="@drawable/bg_edittext"
-                android:hint="-------"
+                android:hint="Enter you Address"
                 android:paddingLeft="20dp" />
 
             <Button

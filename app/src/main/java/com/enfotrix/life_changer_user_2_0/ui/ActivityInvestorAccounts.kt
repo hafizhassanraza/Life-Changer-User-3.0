@@ -109,7 +109,6 @@ class ActivityInvestorAccounts : AppCompatActivity(), InvestorAccountsAdapter.On
     }
 
     private fun setData(accountsList: List<ModelBankAccount>) {
-        Toast.makeText(mContext, "calling", Toast.LENGTH_SHORT).show()
         adapter = InvestorAccountsAdapter(constants.FROM_INVESTOR_ACCOUNTS, accountsList, this@ActivityInvestorAccounts)
         binding.rvInvestorAccounts.adapter = adapter
     }

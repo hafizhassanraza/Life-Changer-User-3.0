@@ -147,7 +147,7 @@
                             android:layout_width="280dp"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/inter"
-                            android:text="--------"
+                            android:text="--"
                             android:layout_marginTop="5dp"
                             android:textColor="@color/white"
                             android:textSize="18dp"
@@ -206,7 +206,7 @@
                                 android:id="@+id/tvBalance"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="---"
+                                android:text="--"
                                 android:textColor="@color/white"
                                 android:textSize="25dp"
                                 android:textStyle="bold" />

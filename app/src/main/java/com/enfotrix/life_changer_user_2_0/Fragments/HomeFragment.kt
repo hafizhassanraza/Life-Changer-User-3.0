@@ -48,7 +48,6 @@ import com.enfotrix.life_changer_user_2_0.ui.ActivityWithdraw
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
-import com.pixelcarrot.base64image.Base64Image
 import org.json.JSONException
 import org.json.JSONObject
 

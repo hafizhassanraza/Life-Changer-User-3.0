@@ -99,6 +99,7 @@ class ActivityEditNominee : AppCompatActivity() {
     }
 
     private fun setData(user:ModelUser){
+        utils.endLoadingAnimation()
         binding.apply {
             val nomineeArray = resources.getStringArray(R.array.nomineeRelationSpiner)
             val position = nomineeArray.indexOf(user.nominees.user_relation)
@@ -113,11 +114,10 @@ class ActivityEditNominee : AppCompatActivity() {
 
     private fun getUser() {
 
-
+        utils.startLoadingAnimation()
         val stringRequest = object : StringRequest(
             Request.Method.POST, ApiUrls.USER_DATA_API,
             { response ->
-                utils.endLoadingAnimation()
                 try {
                     val jsonObject = JSONObject(response)
                     if (jsonObject.getBoolean("success")) {
@@ -130,6 +130,7 @@ class ActivityEditNominee : AppCompatActivity() {
                         Toast.makeText(mContext, error, Toast.LENGTH_SHORT).show()
                     }
                 } catch (e: JSONException) {
+                    utils.endLoadingAnimation()
                     e.printStackTrace()
                     Toast.makeText(mContext, e.message.toString(), Toast.LENGTH_SHORT).show()
                 }
@@ -203,7 +204,6 @@ class ActivityEditNominee : AppCompatActivity() {
                 // Handle errors
                 utils.endLoadingAnimation()
                 Toast.makeText(mContext, "Response: ${error.message}", Toast.LENGTH_SHORT).show()
-
                 Log.e("VolleyError", "Error: $error")
             }) {
             // Override getParams() to add POST parameters

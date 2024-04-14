@@ -39,6 +39,7 @@ import org.json.JSONException
 import org.json.JSONObject
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.text.Editable
 import android.util.Base64
 import com.android.volley.DefaultRetryPolicy
 import com.android.volley.NetworkResponse
@@ -345,6 +346,7 @@ class ActivityProfile : AppCompatActivity() {
 
 
     private fun setData(user: ModelUser) {
+        utils.endLoadingAnimation()
         Glide.with(mContext).load(sharedPrefManager.getUser().photo).centerCrop()
             .placeholder(R.drawable.ic_launcher_background).into(binding.imgUser);
         binding.tvUserName.text = user.name
@@ -445,14 +447,14 @@ class ActivityProfile : AppCompatActivity() {
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.setContentView(R.layout.dialog_update_name)
-
         val etUserName = dialog.findViewById<EditText>(R.id.name)
         val etFatherName = dialog.findViewById<EditText>(R.id.fatherName)
         val address = dialog.findViewById<EditText>(R.id.address)
         val btnUpdateName = dialog.findViewById<Button>(R.id.updateName)
-        etUserName.setText(user_.name)
-        etFatherName.setText(user_.father_name)
-        address.setText(user_.address)
+        etUserName.text = user_.name?.takeIf { it.isNotBlank() }?.let { Editable.Factory.getInstance().newEditable(it) } ?: Editable.Factory.getInstance().newEditable("")
+        etFatherName.text = user_.father_name?.takeIf { it.isNotBlank() }?.let { Editable.Factory.getInstance().newEditable(it) } ?: Editable.Factory.getInstance().newEditable("")
+        address.text = user_.address?.takeIf { it.isNotBlank() }?.let { Editable.Factory.getInstance().newEditable(it) } ?: Editable.Factory.getInstance().newEditable("")
+
         btnUpdateName.setOnClickListener {
             val userName = etUserName.text.toString().trim()
             val fatherName = etFatherName.text.toString().trim()
@@ -473,14 +475,8 @@ class ActivityProfile : AppCompatActivity() {
                 return@setOnClickListener
             }
             else {
-
                 updateData(userName,userAddress,fatherName)
-
             }
-//
-//            // All fields are valid, display the entered data in a toast message
-//            val toastMessage = "Name: $userName\nFather's Name: $fatherName\nAddress: $userAddress"
-//            Toast.makeText(mContext, toastMessage, Toast.LENGTH_SHORT).show()
         }
 
         dialog.show()
@@ -489,22 +485,15 @@ class ActivityProfile : AppCompatActivity() {
 
     fun openGallery() {
         val intent = Intent(Intent.ACTION_PICK)
-        intent.type = "image/*" // Allow only images
-
+        intent.type = "image/*"
         startActivityForResult(intent, PICK_IMAGE_REQUEST)
     }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK) {
-            // Check if the intent data is not null and the data is valid
             data?.data?.let { selectedImageUri ->
-                // Convert the selected image URI to a bitmap
                 val inputStream = contentResolver.openInputStream(selectedImageUri)
                 val selectedImageBitmap = BitmapFactory.decodeStream(inputStream)
-                // Call the updateUserPhoto function with the selected image bitmap
-
-
                 uploadImageToServer(selectedImageBitmap)
             }
         }
@@ -515,12 +504,11 @@ class ActivityProfile : AppCompatActivity() {
     private fun getUser() {
 
 
-
+utils.startLoadingAnimation()
         val stringRequest = object : StringRequest(
             Request.Method.POST, ApiUrls.USER_DATA_API,
             com.android.volley.Response.Listener { response ->
                 // Handle the response
-                utils.endLoadingAnimation()
 
                 try {
 
@@ -533,7 +521,7 @@ class ActivityProfile : AppCompatActivity() {
                             val user: ModelUser = gson.fromJson(jsonObject.getJSONObject("data").toString(), ModelUser::class.java)
                             user_=user
 
-                            Toast.makeText(mContext, user.toString(), Toast.LENGTH_SHORT).show()
+//                            Toast.makeText(mContext, user.toString(), Toast.LENGTH_SHORT).show()
                             sharedPrefManager.setLoginStatus(user.status)
                             sharedPrefManager.saveUser(user)
 
@@ -541,6 +529,7 @@ class ActivityProfile : AppCompatActivity() {
 
 
                         } else if (jsonObject.getBoolean("success") == false) {
+                            utils.endLoadingAnimation()
 
                             var error = jsonObject.getString("message")
                             Toast.makeText(mContext, " ${error}", Toast.LENGTH_SHORT).show()
@@ -612,7 +601,8 @@ class ActivityProfile : AppCompatActivity() {
 
 
                             Log.e("t2", response.getString("data").toString())
-                            Toast.makeText(mContext, response.getString("data").toString(), Toast.LENGTH_SHORT).show()
+//                            Toast.makeText(mContext, response.getString("data").toString(), Toast.LENGTH_SHORT).show()
+
 
 
                         } else if (response.getBoolean("success") == false) {
@@ -631,7 +621,7 @@ class ActivityProfile : AppCompatActivity() {
                 }
 
 
-                Toast.makeText(mContext, "d1"+response.toString(), Toast.LENGTH_SHORT).show()
+//                Toast.makeText(mContext, "d1"+response.toString(), Toast.LENGTH_SHORT).show()
                 // Handle success response
                 // You can parse the response JSON object here
             },

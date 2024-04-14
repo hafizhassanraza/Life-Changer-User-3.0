@@ -40,25 +40,31 @@ class ActivitySplash : AppCompatActivity() {
 
     private fun navigateToNextScreen() {
         if (sharedPrefManager.isLoggedIn()) {
-            Toast.makeText(mContext, "debug1", Toast.LENGTH_SHORT).show()
 
-            when {
-                sharedPrefManager.getStatus() == constants.INVESTOR_STATUS_ACTIVE ||
-                        sharedPrefManager.getUser()!!.status == constants.INVESTOR_STATUS_PENDING  -> {
-                    startActivity(Intent(mContext, MainActivity::class.java))
-                    finish()
+
+
+                when {
+                    sharedPrefManager.getStatus() == constants.INVESTOR_STATUS_ACTIVE ||
+                            sharedPrefManager.getStatus() == constants.INVESTOR_STATUS_PENDING -> {
+                        startActivity(Intent(mContext, MainActivity::class.java))
+                        finish()
+                    }
+                    sharedPrefManager.getStatus() == constants.INVESTOR_STATUS_INCOMPLETE -> {
+                        startActivity(Intent(mContext, ActivityUserDetails::class.java))
+                        finish()
+                    }
                 }
-                sharedPrefManager.getStatus() == constants.INVESTOR_STATUS_INCOMPLETE -> {
-                    startActivity(Intent(mContext, ActivityUserDetails::class.java))
-                    finish()
-                }
+//            else {
+//                // Handle the case when the user object is null
+//                Toast.makeText(mContext, "User data is null", Toast.LENGTH_SHORT).show()
+//            }
             }
-        } else {
-            Toast.makeText(mContext, "debug", Toast.LENGTH_SHORT).show()
+        else {
             startActivity(Intent(mContext, ActivityLogin::class.java))
             finish()
+
         }
-    }
+        }
 
     companion object {
         private const val DELAY_TIME = 1500L

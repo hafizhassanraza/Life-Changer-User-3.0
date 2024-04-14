@@ -20,13 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         >
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAlignment="center"
-            android:alpha="0.5"
-            android:text="swipe down to refresh"
-            android:textSize="14dp" />
+
 
         <ImageView
             android:id="@+id/imgBack"
@@ -53,17 +47,17 @@
 
 
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:alpha="0.5"
+        android:text="swipe down to refresh"
+        android:textSize="14dp" />
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAlignment="center"
-            android:alpha="0.5"
-            android:text="swipe down to refresh"
-            android:textSize="14dp" />
 
         <ImageView
             android:layout_width="60dp"

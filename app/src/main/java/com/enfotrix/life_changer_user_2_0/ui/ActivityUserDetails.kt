@@ -281,7 +281,7 @@ class ActivityUserDetails : AppCompatActivity() {
 
 
                             sharedPrefManager.setLoginStatus(constants.INVESTOR_STATUS_PENDING)
-                            Toast.makeText(mContext, " ${jsonObject.getString("message")}", Toast.LENGTH_SHORT).show()
+//                            Toast.makeText(mContext, " ${jsonObject.getString("message")}", Toast.LENGTH_SHORT).show()
 
 
                             startActivity(

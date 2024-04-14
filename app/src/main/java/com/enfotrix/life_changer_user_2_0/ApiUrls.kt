@@ -18,7 +18,4 @@ object ApiUrls {
     const val UPDATE_PROFILE_API = "$base/api/update-profile"
 
 
-
-
-
 }

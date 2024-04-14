@@ -59,25 +59,15 @@
                         android:layout_height="wrap_content"
                         >
 
-                        <EditText
-                            android:id="@+id/base"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"/>
                         <TextView
                             android:id="@+id/tvUserName"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="-----------"
+                            android:text="--"
                             android:textColor="@color/black"
                             android:textSize="20sp"
                             android:textStyle="bold" />
-                        <ImageView
-                            android:id="@+id/editName"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="4dp"
-                            android:layout_marginTop="1dp"
-                            android:src="@drawable/edit_icon"/>
+
 
                     </LinearLayout>
 
@@ -86,7 +76,7 @@
                         android:id="@+id/tvCNIC"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="-------------"
+                        android:text="--"
                         android:layout_marginBottom="10dp"
                         android:textColor="@color/textGrey"
                         android:textSize="15sp"
@@ -143,13 +133,13 @@
                                         android:id="@+id/tvFatherName"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="-------"
+                                        android:text="--"
                                         android:textColor="@color/black"
                                         />
                                 </LinearLayout>
 
                                 <LinearLayout
-                                    android:id="@+id/addressLay"
+                                    android:id="@+id/editName"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:orientation="horizontal"
@@ -174,7 +164,7 @@
                                         android:id="@+id/tvAddress"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="House # 64 , Nawab City , Islamabad Road Sargodha"
+                                        android:text="--"
                                         android:textColor="@color/black"
                                         android:layout_gravity="center_vertical"
                                         />
@@ -232,7 +222,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center_vertical"
-                                android:text="----------"
+                                android:text="--"
                                 android:maxLength="11"
                                 android:textColor="@color/black"
                                 android:textSize="15sp"
@@ -369,7 +359,7 @@
                                     android:id="@+id/tvNomineeName"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Muhammad Ashraf"
+                                    android:text="--"
                                     android:layout_alignParentTop="true"
                                     android:layout_alignParentLeft="true"
                                     android:textColor="@color/black"
@@ -392,7 +382,7 @@
                                         android:id="@+id/tvNomineeFatherName"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="Muhammad Abdullah"
+                                        android:text="--"
                                         android:textSize="12dp"
                                         android:textColor="@color/textGrey"
                                         android:textStyle="bold" />
@@ -416,7 +406,7 @@
 
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="38403-3093530-7"
+                                        android:text="--"
                                         android:textColor="@color/textGrey"
                                         android:textSize="12dp"
                                         android:textStyle="bold" />
@@ -442,7 +432,7 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:textSize="12dp"
-                                        android:text="House # 64 , Nawab City , Islamabad Road Sargodha"
+                                        android:text="--"
                                         android:textColor="@color/textGrey"
                                         android:textStyle="bold" />
 

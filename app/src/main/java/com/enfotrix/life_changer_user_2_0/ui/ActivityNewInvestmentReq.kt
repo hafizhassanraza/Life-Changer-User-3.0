@@ -147,11 +147,7 @@ class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.On
                     if (jsonObject != null) {
 
                         if (jsonObject.getBoolean("success") == true) {
-
-
-
                             val gson = Gson()
-
                             val user: ModelUser = gson.fromJson(jsonObject.getJSONObject("data").toString(), ModelUser::class.java)
                             /*var investment = user.investment
                             val ExpextedSum =  investment.in_active_investment+ investment.active_investment +investment.profit*/
@@ -288,90 +284,6 @@ class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.On
     }
 
 
-
-
-    private fun setData(user : ModelUser , adminAccountList : List<ModelBankAccount> ) {
-
-       /* binding.
-
-
-
-        binding.tvAnnouncement.text=sharedPrefManager.getAnnouncement().announcement
-        binding.tvUserName.text= sharedPrefManager.getUser().name
-
-        //binding.uName.text= sharedPrefManager.getUser().firstName
-        //binding.tvBalance.text= sharedPrefManager.getInvestment().investmentBalance
-
-
-
-
-
-
-        val activeInvestment = user!!.investment!!.active_investment
-        val profit = user.investment.profit
-        val inActiveInvestment = user.investment.in_active_investment
-        val ExpextedSum = activeInvestment + inActiveInvestment + profit
-
-        binding.tvBalance.text = activeInvestment.toString()
-        binding.availableProfit.text = profit.toString()
-        binding.tvInActiveInvestment.text = inActiveInvestment.toString()
-        binding.tvExpectedSum.text = ExpextedSum.toString()
-
-        Glide.with(mContext)
-            .load(user.photo)
-            .centerCrop()
-            .placeholder(R.drawable.profile_person_icon) // Placeholder image while loading
-            .into(binding.imageView)*/
-
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    fun getTextFromInvestment(value: String?): String {
-        return if (value.isNullOrEmpty()) "0" else value
-    }
 
     fun showReceiptDialog() {
         userReceiptPhoto = false

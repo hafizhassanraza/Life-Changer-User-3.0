@@ -58,8 +58,6 @@ class ActivityNewWithdrawReq : AppCompatActivity(), InvestorAccountsAdapter.OnIt
     private var phoneNumber = null
     private var balance_: Int? = null
     private lateinit var userAccounts: List<ModelBankAccount>
-
-
     private lateinit var adapter: InvestorAccountsAdapter
 
     private var accountID: String = ""
@@ -75,8 +73,6 @@ class ActivityNewWithdrawReq : AppCompatActivity(), InvestorAccountsAdapter.OnIt
         sharedPrefManager = SharedPrefManager(mContext)
         setTitle("Add Withdraw Request")
         getAccounts()
-
-
         confirmationDialog = Dialog(mContext)
         confirmationDialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         confirmationDialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -122,11 +118,7 @@ class ActivityNewWithdrawReq : AppCompatActivity(), InvestorAccountsAdapter.OnIt
     }
 
     private fun withDrawAmount(balanceValue: String) {
-
-
         Toast.makeText(mContext, "" + balanceValue + accountID, Toast.LENGTH_SHORT).show()
-
-
         utils.startLoadingAnimation()
 
         val stringRequest = object : StringRequest(

@@ -78,7 +78,7 @@
                 android:id="@+id/tvUserName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Hassan Raza"
+                android:text="--"
                 android:textColor="@color/white"
                 android:textSize="25sp"
                 android:textStyle="bold" />
@@ -87,7 +87,7 @@
                 android:id="@+id/tvCNIC"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="38403-3093530-7"
+                android:text="--"
                 android:layout_marginBottom="10dp"
                 android:textColor="@color/white"
                 android:textSize="15sp"

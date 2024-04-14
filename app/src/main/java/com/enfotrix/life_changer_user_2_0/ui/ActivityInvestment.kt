@@ -63,33 +63,8 @@ class ActivityInvestment : AppCompatActivity() {
 
 
         binding.refreshLayout.setOnRefreshListener {
-
             binding.refreshLayout.isRefreshing = false
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
         /*setTitle("My Investments")
