@@ -37,8 +37,20 @@ import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
 import org.json.JSONException
 import org.json.JSONObject
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.util.Base64
+import com.android.volley.DefaultRetryPolicy
+import com.android.volley.NetworkResponse
+
+import com.android.volley.toolbox.JsonObjectRequest
+import com.enfotrix.life_changer_user_2_0.api.DataPart
+import com.enfotrix.life_changer_user_2_0.api.VolleyMultipartRequest
+import java.io.ByteArrayOutputStream
+import java.nio.ByteBuffer
 
 
+//class ActivityProfile(method: Int, mListener: Response.Listener<NetworkResponse>) : AppCompatActivity() {
 class ActivityProfile : AppCompatActivity() {
 
     private val db = Firebase.firestore
@@ -86,6 +98,10 @@ class ActivityProfile : AppCompatActivity() {
                 startActivity(Intent(mContext, ActivityInvestorAccounts::class.java))
             }
             imgUser.setOnClickListener {
+
+
+
+
                 openGallery()
             }
             layPin.setOnClickListener {
@@ -106,6 +122,13 @@ class ActivityProfile : AppCompatActivity() {
         }
 
 
+    }
+
+    fun bitmapToByteArray(bitmap: Bitmap): ByteArray {
+        val byteCount = bitmap.byteCount
+        val buffer = ByteBuffer.allocate(byteCount)
+        bitmap.copyPixelsToBuffer(buffer)
+        return buffer.array()
     }
 
     private fun updatePhone() {
@@ -322,7 +345,6 @@ class ActivityProfile : AppCompatActivity() {
 
 
     private fun setData(user: ModelUser) {
-        Toast.makeText(mContext, "yes", Toast.LENGTH_SHORT).show()
         Glide.with(mContext).load(sharedPrefManager.getUser().photo).centerCrop()
             .placeholder(R.drawable.ic_launcher_background).into(binding.imgUser);
         binding.tvUserName.text = user.name
@@ -477,14 +499,13 @@ class ActivityProfile : AppCompatActivity() {
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK) {
             // Check if the intent data is not null and the data is valid
             data?.data?.let { selectedImageUri ->
-                // Now you can use the selectedImageUri to do further operations, such as uploading the image
-                // For instance, you can display the selected image in an ImageView
-                // imageView.setImageURI(selectedImageUri)
-                // Or perform an upload operation using this URI
-
-                updateUserPhoto(selectedImageUri)
+                // Convert the selected image URI to a bitmap
+                val inputStream = contentResolver.openInputStream(selectedImageUri)
+                val selectedImageBitmap = BitmapFactory.decodeStream(inputStream)
+                // Call the updateUserPhoto function with the selected image bitmap
 
 
+                uploadImageToServer(selectedImageBitmap)
             }
         }
     }
@@ -566,11 +587,136 @@ class ActivityProfile : AppCompatActivity() {
 
 
     /////////////////////////////// PENDING ////////////////////////////////////
-    private fun updateUserPhoto(photo: Uri) {
 
+
+
+    private fun uploadImageToServer(photoBitmap: Bitmap) {
+        utils.startLoadingAnimation()
+
+        val url = "http://192.168.0.103:8000/api/test-photo"
+
+
+
+
+
+        uploadImage(photoBitmap, url,
+            onSuccess = { response ->
+                utils.endLoadingAnimation()
+                try {
+
+
+
+                    if (response != null) {
+
+                        if (response.getBoolean("success") == true) {
+
+
+                            Log.e("t2", response.getString("data").toString())
+                            Toast.makeText(mContext, response.getString("data").toString(), Toast.LENGTH_SHORT).show()
+
+
+                        } else if (response.getBoolean("success") == false) {
+
+                            var error = response.getString("message")
+                            Toast.makeText(mContext, " ${error}", Toast.LENGTH_SHORT).show()
+                        }
+
+                    }
+
+
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                    Toast.makeText(mContext, e.message.toString(), Toast.LENGTH_SHORT).show()
+                    // Handle JSON parsing error
+                }
+
+
+                Toast.makeText(mContext, "d1"+response.toString(), Toast.LENGTH_SHORT).show()
+                // Handle success response
+                // You can parse the response JSON object here
+            },
+            onError = { error ->
+                utils.endLoadingAnimation()
+                Toast.makeText(mContext, "d2"+error.toString(), Toast.LENGTH_SHORT).show()
+
+                // Handle error
+            })
+
+
+    }
+
+    // uploadImage function
+    fun uploadImage(bitmap: Bitmap, url: String, onSuccess: (response: JSONObject) -> Unit, onError: (error: String) -> Unit) {
+
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
+        val imageBytes: ByteArray = byteArrayOutputStream.toByteArray()
+
+        val request = object : VolleyMultipartRequest(
+            Request.Method.POST, url,
+            Response.Listener { response ->
+
+                val jsonResponse = JSONObject(String(response.data))
+                onSuccess(jsonResponse)
+            },
+            Response.ErrorListener { error ->
+                onError(error.message ?: "An error occurred")
+            }
+        ) {
+            override fun getByteData(): MutableMap<String, DataPart> {
+                val params = HashMap<String, DataPart>()
+                val dataPart = DataPart("photo", imageBytes, "image/png")
+                params["photo"] = dataPart
+                return params
+            }
+        }
+
+        request.retryPolicy = DefaultRetryPolicy(
+            0,
+            DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+        )
+
+        Volley.newRequestQueue(mContext).add(request)
+    }
+
+
+
+
+
+
+
+    private fun updateUserPhoto(photo: Bitmap) {
+
+
+
+
+
+
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        photo.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
+        val imageBytes: ByteArray = byteArrayOutputStream.toByteArray()
+
+
+
+
+
+
+
+        //Log.e("img", imageString)
+
+        /*val byteArrayOutputStream = ByteArrayOutputStream()
+        photo.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
+        val imageBytes: ByteArray = byteArrayOutputStream.toByteArray()
+        val photoBase64: String = Base64.encodeToString(imageBytes, Base64.DEFAULT)*/
 
 
         utils.startLoadingAnimation()
+
+
+
+
+        val url = "http://192.168.0.103:8000/api/update-profile"
 
         val stringRequest = object : StringRequest(
             Request.Method.POST, ApiUrls.UPDATE_PROFILE_API,
@@ -585,7 +731,7 @@ class ActivityProfile : AppCompatActivity() {
                     if(jsonObject!=null){
 
                         if(jsonObject.getBoolean("success")==true){
-                            
+
                             val gson = Gson()
                             val user: ModelUser = gson.fromJson(jsonObject.getJSONObject("data").toString(), ModelUser::class.java)
                             sharedPrefManager.saveUser(user)
@@ -632,7 +778,7 @@ class ActivityProfile : AppCompatActivity() {
             // Override getParams() to add POST parameters
             override fun getParams(): MutableMap<String, String> {
                 val params = HashMap<String, String>()
-                params["name"] = "test 123"
+                params["photo"] = "photoBase64"
                 return params
             }
             override fun getHeaders(): MutableMap<String, String> {

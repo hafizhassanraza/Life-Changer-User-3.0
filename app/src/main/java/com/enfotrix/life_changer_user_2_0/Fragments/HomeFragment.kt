@@ -4,8 +4,11 @@ import User
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.Color
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -13,6 +16,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -44,6 +48,7 @@ import com.enfotrix.life_changer_user_2_0.ui.ActivityWithdraw
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
+import com.pixelcarrot.base64image.Base64Image
 import org.json.JSONException
 import org.json.JSONObject
 
@@ -83,36 +88,11 @@ class HomeFragment : Fragment() {
 
         binding.btnInvest.setOnClickListener{
             if(sharedPrefManager.getUser().status.equals(constants.INVESTOR_STATUS_PENDING)) showDialogRequest()
-            else {/*
-            //handle the code for notification
-                            val notification = Notificaion(user.userdevicetoken, NotificationData("Withdraw Request", "Body work title"))
-                            ApiUtilities.api.sendNotification(notification).enqueue(object :
-                                Callback<Notification> {
-                                override fun onResponse(call: Call<Notification>, response: Response<Notification>) {
-                                    if (response.isSuccessful) {
-                                        // Handle successful response here
-                                        // For example, log success message or perform actions on success
-                                        Toast.makeText(mContext, "Notification sent successfully!", Toast.LENGTH_SHORT).show()
-                                    } else {
-                                        // Handle unsuccessful response here
-                                        // For example, log failure message or handle errors
-                                        Toast.makeText(mContext, "Failed to send notification. Error: ${response.message()}", Toast.LENGTH_SHORT).show()
-                                    }
-                                }
+            else startActivity(Intent(mContext, ActivityNewInvestmentReq::class.java))
 
-                                override fun onFailure(call: Call<Notification>, t: Throwable) {
-                                    // Handle failure (exception) here
-                                    // For example, log the exception or perform actions on failure
-                                    Toast.makeText(mContext, "Failed to send notification. Exception: ${t.message}", Toast.LENGTH_SHORT).show()
-                                }
-                            })
-
-                    }*/
-
-                startActivity(Intent(mContext, ActivityNewInvestmentReq::class.java))
-
-            }
         }
+
+
 
 
 
@@ -184,6 +164,7 @@ class HomeFragment : Fragment() {
 
 
     }
+
 
 
 

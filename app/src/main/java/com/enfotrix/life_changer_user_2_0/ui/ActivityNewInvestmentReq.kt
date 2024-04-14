@@ -382,7 +382,7 @@ class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.On
         dialogAddA.setContentView(R.layout.receiptdialog)
 
         val tvSelect = dialogAddA.findViewById<TextView>(R.id.tvSelect)
-     val  image = dialogAddA.findViewById<ImageView>(R.id.imgProfilePhoto)
+        val  image = dialogAddA.findViewById<ImageView>(R.id.imgProfilePhoto)
 
         tvSelect?.setOnClickListener {
             userReceiptPhoto = true
