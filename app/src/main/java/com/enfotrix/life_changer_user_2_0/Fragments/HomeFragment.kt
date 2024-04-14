@@ -91,12 +91,6 @@ class HomeFragment : Fragment() {
 
         }
 
-
-
-
-
-
-
         binding.imgDrawer.setOnClickListener{
             if(sharedPrefManager.getUser().status.equals(constants.INVESTOR_STATUS_PENDING)) showDialogRequest()
             else startActivity(Intent(mContext, ActivityNavDrawer::class.java))
@@ -171,8 +165,6 @@ class HomeFragment : Fragment() {
 
 
     private fun getUser() {
-
-
         utils.startLoadingAnimation()
 
         val stringRequest = object : StringRequest(
@@ -182,19 +174,11 @@ class HomeFragment : Fragment() {
                 utils.endLoadingAnimation()
 
                 try {
-
                     val jsonObject = JSONObject(response)
-
                     if (jsonObject != null) {
-
                         if (jsonObject.getBoolean("success") == true) {
-
-
-
                             val gson = Gson()
-
                             val user: ModelUser = gson.fromJson(jsonObject.getJSONObject("data").toString(), ModelUser::class.java)
-
                             //Toast.makeText(mContext, user.toString(), Toast.LENGTH_SHORT).show()
                             //sharedPrefManager.setLoginStatus(user.status)
                             sharedPrefManager.saveUser(user)
@@ -516,14 +500,14 @@ class HomeFragment : Fragment() {
     }
 
     private fun setData(user:ModelUser) {
-
         binding.tvAnnouncement.text=sharedPrefManager.getAnnouncement().announcement
         binding.tvUserName.text= sharedPrefManager.getUser().name
+        binding.img1.text = user.lc_user ?: "--"
+        binding.img1.setTextColor(if (user.lc_user.isNullOrEmpty()) Color.WHITE else Color.BLACK)
+
 
         //binding.uName.text= sharedPrefManager.getUser().firstName
         //binding.tvBalance.text= sharedPrefManager.getInvestment().investmentBalance
-
-
 
 
 

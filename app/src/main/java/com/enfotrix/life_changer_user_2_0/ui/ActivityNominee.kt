@@ -95,24 +95,16 @@ class ActivityNominee : AppCompatActivity() {
 
 
     fun saveNominee(nominee:ModelNominee){
-
         utils.startLoadingAnimation()
-
         val stringRequest = object : StringRequest(
             Request.Method.POST, ApiUrls.ADD_NOMINEE_API,
             com.android.volley.Response.Listener { response ->
                 utils.endLoadingAnimation()
-
                 try {
                     val jsonObject = JSONObject(response)
-
                     if(jsonObject!=null){
-
                         if(jsonObject.getBoolean("success")==true){
-
-
                             Toast.makeText(mContext, "Nominee Added!", Toast.LENGTH_SHORT).show()
-
                             if(intent.getStringExtra(constants.KEY_ACTIVITY_FLOW).equals(constants.VALUE_ACTIVITY_FLOW_USER_DETAILS)){
                                 isNomineeAdded=true
                                 startActivity(Intent(mContext,ActivityUserDetails::class.java).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK))

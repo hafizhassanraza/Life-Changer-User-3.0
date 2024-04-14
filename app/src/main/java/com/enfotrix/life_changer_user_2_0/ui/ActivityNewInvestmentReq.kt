@@ -3,11 +3,13 @@ import android.app.Activity
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Base64
 import android.util.Log
 import android.view.View
 import android.view.Window
@@ -19,21 +21,18 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
-import com.bumptech.glide.Glide
 import com.enfotrix.life_changer_user_2_0.Adapters.InvestorAccountsAdapter
 import com.enfotrix.life_changer_user_2_0.ApiUrls
 import com.enfotrix.life_changer_user_2_0.Constants
 import com.enfotrix.life_changer_user_2_0.Models.InvestmentViewModel
 import com.enfotrix.life_changer_user_2_0.Models.ModelBankAccount
 import com.enfotrix.life_changer_user_2_0.Models.ModelUser
-import com.enfotrix.life_changer_user_2_0.Models.TransactionModel
 import com.enfotrix.life_changer_user_2_0.Models.UserViewModel
 import com.enfotrix.life_changer_user_2_0.R
 import com.enfotrix.life_changer_user_2_0.SharedPrefManager
@@ -43,9 +42,11 @@ import com.enfotrix.life_changer_user_2_0.databinding.ActivityAddInvestmentBindi
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import kotlinx.coroutines.launch
 import org.json.JSONException
 import org.json.JSONObject
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.IOException
 
 class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.OnItemClickListener {
 
@@ -74,6 +75,7 @@ class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.On
     private var adminAccountID:String=""
 
     private var imageURI: Uri? = null
+    private var finalImageURL: String? = null
     private val IMAGE_PICKER_REQUEST_CODE = 200
     private var userReceiptPhoto: Boolean = false
 
@@ -116,7 +118,21 @@ class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.On
             }
             else if (userReceiptPhoto!=true || imageURI == null) Toast.makeText(mContext, "Please select the transaction image", Toast.LENGTH_SHORT).show()
 
-            else addInvestmentReq()
+            else{
+                imageURI?.let { uri ->
+                    try {
+                        val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, uri)
+                         convertImageToBase64(mContext,bitmap)
+                            dialog.dismiss()
+
+                    } catch (e: IOException) {
+                        // Handle errors related to reading the image bitmap
+                        e.printStackTrace()
+                        Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+            }
 
 
 
@@ -125,7 +141,16 @@ class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.On
 
     }
 
-
+    fun convertImageToBase64(context: Context, bitmap: Bitmap) {
+        val baos = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+        val imageBytes = baos.toByteArray()
+        val imageString = Base64.encodeToString(imageBytes, Base64.DEFAULT)
+        val file = File(context.filesDir, "base64String.txt")
+        file.writeText(imageString)
+        Log.d("convertImageToBase64", imageString)
+        addInvestmentReq(imageString.toString())
+    }
 
 
 
@@ -405,24 +430,18 @@ class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.On
 
     }
 
-    fun addInvestmentReq() {
+   private fun addInvestmentReq(receipt: String) {
         utils.startLoadingAnimation()
         val stringRequest = object : StringRequest(
             Request.Method.POST, ApiUrls.ADD_TRANSACTION_API,
             Response.Listener { response ->
-                // Handle the response
                 utils.endLoadingAnimation()
-
-
                 try {
 
                     val jsonObject = JSONObject(response)
-
                     if(jsonObject!=null){
 
                         if(jsonObject.getBoolean("success")==true){
-
-
                             Toast.makeText(mContext, "Investment Req. Sent!", Toast.LENGTH_SHORT).show()
                             startActivity(Intent(mContext,MainActivity::class.java)
                                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK))
@@ -462,16 +481,11 @@ class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.On
             // Override getParams() to add POST parameters
             override fun getParams(): MutableMap<String, String> {
                 val params = HashMap<String, String>()
-
-
-
-
-
                 params["amount"] = binding.tvBalance.text.toString()
                 params["receiver_account_id"] = adminAccountID
                 params["sender_account_id"] = accountID
                 params["type"] =constants.TRANSACTION_TYPE_INVESTMENT
-                params["receipt"] = "ikshdksgc"
+                params["receipt"] =  "data:image/jpeg;base64,$receipt"
                 return params
             }
             override fun getHeaders(): MutableMap<String, String> {
@@ -537,7 +551,8 @@ class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.On
 
             binding.imgRecieptTransaction.setImageURI(imageURI)
 
-            //imageView.setImageURI(imageURI)
+
+//            binding.imgRecieptTransaction.setImageURI(imageURI)
         }
     }
 

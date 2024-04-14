@@ -152,13 +152,10 @@ class ActivityInvestment : AppCompatActivity() {
 
 
     private fun getTransaction( type:String,status:String ) {
-
-
         utils.startLoadingAnimation()
         val stringRequest = object : StringRequest(
             Request.Method.POST, ApiUrls.ALL_TRANSACTION_API,
             com.android.volley.Response.Listener { response ->
-                // Handle the response
                 utils.endLoadingAnimation()
 
                 try {
@@ -166,9 +163,7 @@ class ActivityInvestment : AppCompatActivity() {
                     val jsonObject = JSONObject(response)
 
                     if (jsonObject != null) {
-
                         if (jsonObject.getBoolean("success") == true) {
-
 
                             val gson = Gson()
                             val transactions: List<TransactionModel> = gson.fromJson(
@@ -176,17 +171,8 @@ class ActivityInvestment : AppCompatActivity() {
                                 object : TypeToken<List<TransactionModel>>() {}.type
                             )
 
-
-
-
                             if(status.equals("Approved")) binding.rvInvestments.adapter= TransactionsAdapter(constants.FROM_APPROVED_INVESTMENT_REQ,transactions)
                             if(status.equals("Pending")) binding.rvInvestments.adapter= TransactionsAdapter(constants.FROM_PENDING_INVESTMENT_REQ,transactions)
-
-
-
-
-
-
 
                         } else if (jsonObject.getBoolean("success") == false) {
 
@@ -221,7 +207,6 @@ class ActivityInvestment : AppCompatActivity() {
 
                 params["type"] = type
                 params["status"] = status
-
                 return params
             }
 
@@ -231,11 +216,7 @@ class ActivityInvestment : AppCompatActivity() {
                     "Bearer ${sharedPrefManager.getToken()}" // Replace "token" with your actual token
                 return headers
             }
-
-
         }
-
-
         Volley.newRequestQueue(mContext).add(stringRequest)
 
 

@@ -48,6 +48,7 @@ import com.android.volley.DefaultRetryPolicy
 import com.android.volley.NetworkResponse
 
 import com.android.volley.toolbox.JsonObjectRequest
+import com.enfotrix.life_changer_user_2_0.StaticEnvironment
 import com.enfotrix.life_changer_user_2_0.api.DataPart
 import com.enfotrix.life_changer_user_2_0.api.VolleyMultipartRequest
 import java.io.ByteArrayOutputStream
@@ -107,11 +108,6 @@ class ActivityProfile : AppCompatActivity() {
                 startActivity(Intent(mContext, ActivityInvestorAccounts::class.java))
             }
             imgUser.setOnClickListener {
-
-
-
-
-
 
                 openGallery()
             }
@@ -537,83 +533,49 @@ class ActivityProfile : AppCompatActivity() {
     }
 
     private fun uploadImageToServer(photo: String) {
-
-
         utils.startLoadingAnimation()
-
         val stringRequest = object : StringRequest(
             Request.Method.POST, ApiUrls.ADD_PHOTO_API,
-            Response.Listener { response ->
-                // Handle the response
+            com.android.volley.Response.Listener { response ->
                 utils.endLoadingAnimation()
-
                 try {
-
                     val jsonObject = JSONObject(response)
-
-                    if(jsonObject!=null){
-
-                        if(jsonObject.getBoolean("success")==true){
-
-                            Toast.makeText(mContext, jsonObject.toString(), Toast.LENGTH_SHORT).show()
-                            Log.d("outPut", "uploadImageToServer: ${jsonObject.toString()}")
-
-                        }
-                        else if(jsonObject.getBoolean("success")==false) {
-
-                            var error= jsonObject.getString("message")
-                            Toast.makeText(mContext, error, Toast.LENGTH_SHORT).show()
-                        }
-
-
-
+                    val success = jsonObject.optBoolean("success", false)
+                    if (success) {
+                        getUser()
+                        val message = jsonObject.optString("message", "Image uploaded successfully")
+                        Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
+                        Log.d("UploadImage", "Image uploaded successfully. Response: $jsonObject")
+                    } else {
+                        val errorMessage = jsonObject.optString("message", "Unknown error occurred")
+                        Toast.makeText(mContext, errorMessage, Toast.LENGTH_SHORT).show()
+                        Log.e("UploadImage", "Error occurred during image upload: $errorMessage")
                     }
-
-
                 } catch (e: JSONException) {
                     e.printStackTrace()
-                    Toast.makeText(mContext, e.message.toString(), Toast.LENGTH_SHORT).show()
-                    // Handle JSON parsing error
+                    Toast.makeText(mContext, "JSON parsing error: ${e.message}", Toast.LENGTH_SHORT).show()
+                    Log.e("UploadImage", "JSON parsing error: ${e.message}")
                 }
-
-
-
             },
-            Response.ErrorListener { error ->
-                // Handle errors
+            com.android.volley.Response.ErrorListener { error ->
+                Toast.makeText(mContext, "Error occurred: ${error.message}", Toast.LENGTH_SHORT).show()
                 utils.endLoadingAnimation()
-                Toast.makeText(mContext, "Response: ${error.message}", Toast.LENGTH_SHORT).show()
-
                 Log.e("VolleyError", "Error: $error")
             }) {
-            // Override getParams() to add POST parameters
+
             override fun getParams(): MutableMap<String, String> {
                 val params = HashMap<String, String>()
-                "data:image/jpeg;base64,$photo"
                 params["photo"] = "data:image/jpeg;base64,$photo"
-
                 return params
             }
-            /*override fun getParams(): MutableMap<String, String> {
-                return hashMapOf(
-                    "name" to req.name,
-                    "cnic" to req.cnic,
-                    "pin" to req.pin,
-                    "address" to req.address,
-                    "phone" to req.phone,
-                    "father_name" to req.father_name
-                )
-            }*/
-
+            override fun getHeaders(): MutableMap<String, String> {
+                val headers = HashMap<String, String>()
+                headers["Authorization"] = "Bearer ${sharedPrefManager.getToken()}"
+                return headers
+            }
         }
 
-
         Volley.newRequestQueue(mContext).add(stringRequest)
-
-
-
-
-
     }
 
 
@@ -637,7 +599,6 @@ class ActivityProfile : AppCompatActivity() {
                             val user: ModelUser = gson.fromJson(jsonObject.getJSONObject("data").toString(), ModelUser::class.java)
                             user_=user
 
-//                            Toast.makeText(mContext, user.toString(), Toast.LENGTH_SHORT).show()
                             sharedPrefManager.setLoginStatus(user.status)
                             sharedPrefManager.saveUser(user)
 
@@ -660,8 +621,6 @@ class ActivityProfile : AppCompatActivity() {
                     Toast.makeText(mContext, e.message.toString(), Toast.LENGTH_SHORT).show()
                     // Handle JSON parsing error
                 }
-
-
             },
             com.android.volley.Response.ErrorListener { error ->
                 // Handle errors

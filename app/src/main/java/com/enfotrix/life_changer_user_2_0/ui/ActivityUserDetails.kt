@@ -76,44 +76,31 @@ class ActivityUserDetails : AppCompatActivity() {
 
 
     private val IMAGE_PICKER_REQUEST_CODE = 200
-
     private lateinit var uploadedImageURI: Uri
-
     val apiService = ApiClient.service()
-
     private var imageURI: Uri? = null
     private var NomineeCnicFrontURI: Uri? = null
     private var NomineeCnicBackURI: Uri? = null
     private var UserCnicFrontURI: Uri? = null
     private var UserCnicBackURI: Uri? = null
-
     private lateinit var imgSelectCnicBack: ImageView
     private lateinit var imgSelectCnicFront: ImageView
-
     private var NomineeCnicFront: Boolean = false
     private var NomineeCnicBack: Boolean = false
     private var UserCnicFront: Boolean = false
     private var UserCnicBack: Boolean = false
     private var UserProfilePhoto: Boolean = false
-
     private val userViewModel: UserViewModel by viewModels()
     private val nomineeViewModel: NomineeViewModel by viewModels()
     private val investmentViewModel: InvestmentViewModel by viewModels()
-
     private lateinit var binding: ActivityUserDetailsBinding
-
     private lateinit var imgProfilePhoto: ImageView
-
-
     private lateinit var utils: Utils
     private lateinit var mContext: Context
     private lateinit var constants: Constants
     private lateinit var user: User
     private lateinit var sharedPrefManager: SharedPrefManager
     private lateinit var dialog: Dialog
-
-
-
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -124,9 +111,7 @@ class ActivityUserDetails : AppCompatActivity() {
         utils = Utils(mContext)
         constants = Constants()
         sharedPrefManager = SharedPrefManager(mContext)
-
         binding.btnStart.visibility = View.GONE
-
         //checkProfileStatus()
 
 
@@ -147,8 +132,19 @@ class ActivityUserDetails : AppCompatActivity() {
 
         setData()
 
-        binding.layAddNominee.setOnClickListener {
 
+        binding.layInvestorBank.setOnClickListener {
+            if (isUserBankAdded) Toast.makeText(
+                mContext,
+                "User Bank already added!",
+                Toast.LENGTH_SHORT
+            ).show()
+            else showAddAccountDialog(constants.VALUE_DIALOG_FLOW_INVESTOR_BANK)
+
+        }
+
+
+        binding.layAddNominee.setOnClickListener {
             if (isNomineeAdded) Toast.makeText(
                 mContext,
                 "Nominee already added",
@@ -162,27 +158,18 @@ class ActivityUserDetails : AppCompatActivity() {
             )
         }
 
-        binding.layInvestorBank.setOnClickListener {
-            if (isUserBankAdded) Toast.makeText(
-                mContext,
-                "User Bank already added!",
-                Toast.LENGTH_SHORT
-            ).show()
-            else showAddAccountDialog(constants.VALUE_DIALOG_FLOW_INVESTOR_BANK)
 
-        }
 
 
         binding.layInvestorNomineeBank.setOnClickListener {
-            showAddAccountDialog(constants.VALUE_DIALOG_FLOW_NOMINEE_BANK)
-//            if (isNomineeAdded) {
-//                if (isNomineeBankAdded) Toast.makeText(
-//                    mContext,
-//                    "Nominee Bank details already added!",
-//                    Toast.LENGTH_SHORT
-//                ).show()
-//                else showAddAccountDialog(constants.VALUE_DIALOG_FLOW_NOMINEE_BANK)
-//            } else Toast.makeText(mContext, "Please Add Nominee First!", Toast.LENGTH_SHORT).show()
+            if (isNomineeAdded) {
+                if (isNomineeBankAdded) Toast.makeText(
+                    mContext,
+                    "Nominee Bank details already added!",
+                    Toast.LENGTH_SHORT
+                ).show()
+                else showAddAccountDialog(constants.VALUE_DIALOG_FLOW_NOMINEE_BANK)
+            } else Toast.makeText(mContext, "Please Add Nominee First!", Toast.LENGTH_SHORT).show()
         }
 
 
@@ -190,7 +177,6 @@ class ActivityUserDetails : AppCompatActivity() {
 
 
         binding.layInvestorProfilePhoto.setOnClickListener {
-            showPhotoDialog()
             if (isUserPhotoAdded) Toast.makeText(mContext, "User photo already added!", Toast.LENGTH_SHORT).show()
             else showPhotoDialog()
         }
@@ -207,15 +193,14 @@ class ActivityUserDetails : AppCompatActivity() {
 
 
         binding.layInvestorNomineeCNIC.setOnClickListener {
-            showAddCnicDialog(constants.VALUE_DIALOG_FLOW_NOMINEE_CNIC)
-//            if (isNomineeAdded) {
-//                if (isNomineeCNICAdded) Toast.makeText(
-//                    mContext,
-//                    "Nominee CNIC already added!",
-//                    Toast.LENGTH_SHORT
-//                ).show()
-//                else showAddCnicDialog(constants.VALUE_DIALOG_FLOW_NOMINEE_CNIC)
-//            } else Toast.makeText(mContext, "Please Add Nominee First!", Toast.LENGTH_SHORT).show()
+            if (isNomineeAdded) {
+                if (isNomineeCNICAdded) Toast.makeText(
+                    mContext,
+                    "Nominee CNIC already added!",
+                    Toast.LENGTH_SHORT
+                ).show()
+                else showAddCnicDialog(constants.VALUE_DIALOG_FLOW_NOMINEE_CNIC)
+            } else Toast.makeText(mContext, "Please Add Nominee First!", Toast.LENGTH_SHORT).show()
 
 
         }
@@ -391,8 +376,6 @@ class ActivityUserDetails : AppCompatActivity() {
                     Glide.with(mContext).load(data?.data).into(imgProfilePhoto)
                     imageURI = data?.data
 
-
-
                 }
             }
 
@@ -437,6 +420,12 @@ class ActivityUserDetails : AppCompatActivity() {
             binding.tvHeaderNominee.setTextColor(Color.parseColor("#2F9B47"))
             binding.imgCheckNominee.setImageResource(R.drawable.check_small)
         }
+        if (isUserPhotoAdded) {
+            checkCounter++
+            binding.tvHeaderUserPhoto.text = "Completed"
+            binding.tvHeaderUserPhoto.setTextColor(Color.parseColor("#2F9B47"))
+            binding.imgCheckUserPhoto.setImageResource(R.drawable.check_small)
+        }
         if (isNomineeBankAdded) {
             checkCounter++
             binding.tvHeaderNomineeBank.text = "Completed"
@@ -450,30 +439,25 @@ class ActivityUserDetails : AppCompatActivity() {
             binding.imgCheckUserBank.setImageResource(R.drawable.check_small)
         }
 
-        if (isUserPhotoAdded) {
-            checkCounter++
-            binding.tvHeaderUserPhoto.text = "Completed"
-            binding.tvHeaderUserPhoto.setTextColor(Color.parseColor("#2F9B47"))
-            binding.imgCheckUserPhoto.setImageResource(R.drawable.check_small)
-        }
+
         if (isUserCNICAdded) {
             checkCounter++
             binding.tvHeaderUserCnic.text = "Completed"
             binding.tvHeaderUserCnic.setTextColor(Color.parseColor("#2F9B47"))
             binding.imgCheckUserCnic.setImageResource(R.drawable.check_small)
         }
-//        if (isNomineeCNICAdded) {
-//            checkCounter++
-//            binding.tvHeaderNomineeCnic.text = "Completed"
-//            binding.tvHeaderNomineeCnic.setTextColor(Color.parseColor("#2F9B47"))
-//            binding.imgCheckNomineeCnic.setImageResource(R.drawable.check_small)
-//        }
-        /* if (isPhoneNumberAdded) {
+        if (isNomineeCNICAdded) {
             checkCounter++
-            binding.tvHeaderUserPhoneNumber.text = "Completed"
-            binding.tvHeaderUserPhoneNumber.setTextColor(Color.parseColor("#2F9B47"))
-            binding.imgCheckUserPhoneNumber.setImageResource(R.drawable.check_small)
-        }*/
+            binding.tvHeaderNomineeCnic.text = "Completed"
+            binding.tvHeaderNomineeCnic.setTextColor(Color.parseColor("#2F9B47"))
+            binding.imgCheckNomineeCnic.setImageResource(R.drawable.check_small)
+        }
+//        if (isPhoneNumberAdded) {
+//            checkCounter++
+//            binding.tvHeaderUserPhoneNumber.text = "Completed"
+//            binding.tvHeaderUserPhoneNumber.setTextColor(Color.parseColor("#2F9B47"))
+//            binding.imgCheckUserPhoneNumber.setImageResource(R.drawable.check_small)
+//        }
 
 
 
@@ -484,7 +468,7 @@ class ActivityUserDetails : AppCompatActivity() {
 //        if (checkCounter == 5) binding.v5.setBackgroundColor(resources.getColor(R.color.primary))
 //        if (checkCounter == 6) binding.v6.setBackgroundColor(resources.getColor(R.color.primary))
 
-        if (checkCounter == 3) {
+        if (checkCounter == 6) {
             binding.btnStart.visibility = View.VISIBLE
 
         }
@@ -583,13 +567,11 @@ class ActivityUserDetails : AppCompatActivity() {
         UserCnicFront = false
         UserCnicBack = false
         UserProfilePhoto = false
-
         NomineeCnicFrontURI = null
         NomineeCnicBackURI = null
         UserCnicFrontURI = null
         UserCnicBackURI = null
         imageURI = null
-
         dialog = Dialog(mContext)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -606,7 +588,6 @@ class ActivityUserDetails : AppCompatActivity() {
             tvHeader.setText("Nominee CNIC Photo !")
             tvHeaderDesc.setText("Upload both (Front and Back) side photo of your Nominee CNIC")
         }
-
 
         tvSelectCnicFront.setOnClickListener {
             NomineeCnicFront = type == constants.VALUE_DIALOG_FLOW_NOMINEE_CNIC
@@ -692,9 +673,21 @@ class ActivityUserDetails : AppCompatActivity() {
                     val jsonObject = JSONObject(response)
                     val success = jsonObject.optBoolean("success", false)
                     if (success) {
+                        if(from==constants.VALUE_DIALOG_FLOW_INVESTOR_CNIC){
+                            isUserCNICAdded=true
+                            setData()
+                        }
+                        else if(from==constants.VALUE_DIALOG_FLOW_NOMINEE_CNIC){
+                            isNomineeCNICAdded=true
+                            setData()
+                        }
                         val message = jsonObject.optString("message", "Image uploaded successfully")
                         Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
+
+
+
                         Log.d("UploadImage", "Image uploaded successfully. Response: $jsonObject")
+
                     } else {
                         val errorMessage = jsonObject.optString("message", "Unknown error occurred")
                         Toast.makeText(mContext, errorMessage, Toast.LENGTH_SHORT).show()
@@ -716,10 +709,10 @@ class ActivityUserDetails : AppCompatActivity() {
                 val params = HashMap<String, String>()
                 params["photo_front"] = "data:image/jpeg;base64,$frontBase64"
                 params["photo_back"] = "data:image/jpeg;base64,$backBase64"
-                if("from_investor"==constants.VALUE_DIALOG_FLOW_INVESTOR_CNIC){
+                if(from==constants.VALUE_DIALOG_FLOW_INVESTOR_CNIC){
                     params["type"] = "user"
                 }
-                else if("from_nominee"==constants.VALUE_DIALOG_FLOW_NOMINEE_CNIC){
+                else if(from==constants.VALUE_DIALOG_FLOW_NOMINEE_CNIC){
                     params["type"] = "nominee"
                 }
                 return params
@@ -791,7 +784,6 @@ class ActivityUserDetails : AppCompatActivity() {
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.setContentView(R.layout.dialog_profile_photo_upload)
-
         imgProfilePhoto = dialog.findViewById<ImageView>(R.id.imgProfilePhoto)
         val tvSelect = dialog.findViewById<TextView>(R.id.tvSelect)
         val btnUplodProfile = dialog.findViewById<Button>(R.id.btnUpload)
@@ -803,7 +795,6 @@ class ActivityUserDetails : AppCompatActivity() {
 
         btnUplodProfile.setOnClickListener {
             if (imageURI != null) {
-
                 imageURI?.let { uri ->
                     val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, uri)
                     convertImageToBase64(this, bitmap)?.let {
@@ -849,6 +840,8 @@ class ActivityUserDetails : AppCompatActivity() {
                     val jsonObject = JSONObject(response)
                     val success = jsonObject.optBoolean("success", false)
                     if (success) {
+                        isUserPhotoAdded=true
+                        setData()
                         val message = jsonObject.optString("message", "Image uploaded successfully")
                         Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
                         Log.d("UploadImage", "Image uploaded successfully. Response: $jsonObject")

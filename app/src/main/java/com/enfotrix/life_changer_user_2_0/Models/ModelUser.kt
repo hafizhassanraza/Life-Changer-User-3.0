@@ -21,7 +21,8 @@ data class ModelUser (
     val father_name: String?,
     val nominees: ModelNominee,
     val accounts: List<ModelBankAccount>,
-    val investment: InvestmentModel
+    val investment: InvestmentModel,
+    val lc_user: String
 
 
 )
