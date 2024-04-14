@@ -8,6 +8,7 @@ object ApiUrls {
     const val CNIC_VALIDATOR_API = "$base/api/cnic-validator"
     const val LOGIN_API = "$base/api/login"
     const val SIGNUP_API = "$base/api/register"
+    const val TEST_PHOTO_API = "$base/api/test-photo"
     const val ADD_PHOTO_API = "$base/api/add-photo"
     const val USER_DATA_API = "$base/api/user-data"
     const val ANNOUNCEMENT_API = "$base/api/announcement"
@@ -17,6 +18,7 @@ object ApiUrls {
     const val ADMIN_ACCOUNTS_API = "$base/api/admin-account"
     const val ADD_TRANSACTION_API = "$base/api/add-transaction"
     const val UPDATE_PROFILE_API = "$base/api/update-profile"
-
+    const val ADD_NOMINEE_API = "$base/api/add-nominee"
+    const val ADD_CNIC_API = "$base/api/add-cnic-photo"
 
 }

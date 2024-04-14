@@ -45,7 +45,7 @@ class ActivityEditNominee : AppCompatActivity() {
         constants= Constants()
         sharedPrefManager = SharedPrefManager(mContext)
         binding.backImage.setOnClickListener {
-            startActivity(Intent(mContext, ActivityNominee::class.java).apply {
+            startActivity(Intent(mContext, ActivityProfile::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
             })
             finish()

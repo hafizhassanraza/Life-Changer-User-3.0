@@ -174,28 +174,25 @@ class ActivityUserDetails : AppCompatActivity() {
 
 
         binding.layInvestorNomineeBank.setOnClickListener {
-
-            if (isNomineeAdded) {
-                if (isNomineeBankAdded) Toast.makeText(
-                    mContext,
-                    "Nominee Bank details already added!",
-                    Toast.LENGTH_SHORT
-                ).show()
-                else showAddAccountDialog(constants.VALUE_DIALOG_FLOW_NOMINEE_BANK)
-            } else Toast.makeText(mContext, "Please Add Nominee First!", Toast.LENGTH_SHORT).show()
+            showAddAccountDialog(constants.VALUE_DIALOG_FLOW_NOMINEE_BANK)
+//            if (isNomineeAdded) {
+//                if (isNomineeBankAdded) Toast.makeText(
+//                    mContext,
+//                    "Nominee Bank details already added!",
+//                    Toast.LENGTH_SHORT
+//                ).show()
+//                else showAddAccountDialog(constants.VALUE_DIALOG_FLOW_NOMINEE_BANK)
+//            } else Toast.makeText(mContext, "Please Add Nominee First!", Toast.LENGTH_SHORT).show()
         }
 
 
 
 
-        binding.layInvestorProfilePhoto.visibility = View.GONE
-        binding.layInvestorCNIC.visibility = View.GONE
-        binding.layInvestorNomineeCNIC.visibility = View.GONE
 
         binding.layInvestorProfilePhoto.setOnClickListener {
             showPhotoDialog()
-            /*if (isUserPhotoAdded) Toast.makeText(mContext, "User photo already added!", Toast.LENGTH_SHORT).show()
-            else showPhotoDialog()*/
+            if (isUserPhotoAdded) Toast.makeText(mContext, "User photo already added!", Toast.LENGTH_SHORT).show()
+            else showPhotoDialog()
         }
 
 
@@ -210,15 +207,15 @@ class ActivityUserDetails : AppCompatActivity() {
 
 
         binding.layInvestorNomineeCNIC.setOnClickListener {
-
-            if (isNomineeAdded) {
-                if (isNomineeCNICAdded) Toast.makeText(
-                    mContext,
-                    "Nominee CNIC already added!",
-                    Toast.LENGTH_SHORT
-                ).show()
-                else showAddCnicDialog(constants.VALUE_DIALOG_FLOW_NOMINEE_CNIC)
-            } else Toast.makeText(mContext, "Please Add Nominee First!", Toast.LENGTH_SHORT).show()
+            showAddCnicDialog(constants.VALUE_DIALOG_FLOW_NOMINEE_CNIC)
+//            if (isNomineeAdded) {
+//                if (isNomineeCNICAdded) Toast.makeText(
+//                    mContext,
+//                    "Nominee CNIC already added!",
+//                    Toast.LENGTH_SHORT
+//                ).show()
+//                else showAddCnicDialog(constants.VALUE_DIALOG_FLOW_NOMINEE_CNIC)
+//            } else Toast.makeText(mContext, "Please Add Nominee First!", Toast.LENGTH_SHORT).show()
 
 
         }
@@ -268,39 +265,22 @@ class ActivityUserDetails : AppCompatActivity() {
             com.android.volley.Response.Listener { response ->
                 // Handle the response
                 utils.endLoadingAnimation()
-
                 try {
-
                     val jsonObject = JSONObject(response)
-
                     if (jsonObject != null) {
-
                         if (jsonObject.getBoolean("success") == true) {
-
-
-
-
-                            sharedPrefManager.setLoginStatus(constants.INVESTOR_STATUS_PENDING)
-//                            Toast.makeText(mContext, " ${jsonObject.getString("message")}", Toast.LENGTH_SHORT).show()
-
-
+                              sharedPrefManager.setLoginStatus(constants.INVESTOR_STATUS_PENDING)
                             startActivity(
                                 Intent(mContext, MainActivity::class.java)
                                     .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
                             )
                             finish()
-
-
-
                         } else if (jsonObject.getBoolean("success") == false) {
-
                             var error = jsonObject.getString("message")
                             Toast.makeText(mContext, " ${error}", Toast.LENGTH_SHORT).show()
                         }
 
                     }
-
-
                 } catch (e: JSONException) {
                     e.printStackTrace()
                     Toast.makeText(mContext, e.message.toString(), Toast.LENGTH_SHORT).show()
@@ -313,7 +293,6 @@ class ActivityUserDetails : AppCompatActivity() {
                 // Handle errors
                 utils.endLoadingAnimation()
                 Toast.makeText(mContext, "Response: ${error.message}", Toast.LENGTH_SHORT).show()
-
                 Log.e("VolleyError", "Error: $error")
             }) {
 
@@ -321,8 +300,6 @@ class ActivityUserDetails : AppCompatActivity() {
             override fun getParams(): MutableMap<String, String> {
                 val params = HashMap<String, String>()
                 params["status"] = constants.INVESTOR_STATUS_PENDING
-
-
                 return params
             }
             override fun getHeaders(): MutableMap<String, String> {
@@ -389,8 +366,6 @@ class ActivityUserDetails : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == IMAGE_PICKER_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-
-
             when {
                 UserCnicFront -> {
                     UserCnicFrontURI = data?.data
@@ -415,12 +390,16 @@ class ActivityUserDetails : AppCompatActivity() {
                 UserProfilePhoto -> {
                     Glide.with(mContext).load(data?.data).into(imgProfilePhoto)
                     imageURI = data?.data
+
+
+
                 }
             }
 
 
         }
     }
+
 
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -471,18 +450,18 @@ class ActivityUserDetails : AppCompatActivity() {
             binding.imgCheckUserBank.setImageResource(R.drawable.check_small)
         }
 
-//        if (isUserPhotoAdded) {
-//            checkCounter++
-//            binding.tvHeaderUserPhoto.text = "Completed"
-//            binding.tvHeaderUserPhoto.setTextColor(Color.parseColor("#2F9B47"))
-//            binding.imgCheckUserPhoto.setImageResource(R.drawable.check_small)
-//        }
-//        if (isUserCNICAdded) {
-//            checkCounter++
-//            binding.tvHeaderUserCnic.text = "Completed"
-//            binding.tvHeaderUserCnic.setTextColor(Color.parseColor("#2F9B47"))
-//            binding.imgCheckUserCnic.setImageResource(R.drawable.check_small)
-//        }
+        if (isUserPhotoAdded) {
+            checkCounter++
+            binding.tvHeaderUserPhoto.text = "Completed"
+            binding.tvHeaderUserPhoto.setTextColor(Color.parseColor("#2F9B47"))
+            binding.imgCheckUserPhoto.setImageResource(R.drawable.check_small)
+        }
+        if (isUserCNICAdded) {
+            checkCounter++
+            binding.tvHeaderUserCnic.text = "Completed"
+            binding.tvHeaderUserCnic.setTextColor(Color.parseColor("#2F9B47"))
+            binding.imgCheckUserCnic.setImageResource(R.drawable.check_small)
+        }
 //        if (isNomineeCNICAdded) {
 //            checkCounter++
 //            binding.tvHeaderNomineeCnic.text = "Completed"
@@ -630,54 +609,133 @@ class ActivityUserDetails : AppCompatActivity() {
 
 
         tvSelectCnicFront.setOnClickListener {
-
             NomineeCnicFront = type == constants.VALUE_DIALOG_FLOW_NOMINEE_CNIC
             UserCnicFront = type == constants.VALUE_DIALOG_FLOW_INVESTOR_CNIC
             UserCnicBack = false
             NomineeCnicBack = false
-
-
             val pickImage = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
             startActivityForResult(pickImage, IMAGE_PICKER_REQUEST_CODE)
-
         }
         tvSelectCnicBack.setOnClickListener {
-
-
             NomineeCnicFront = false
             UserCnicFront = false
             UserCnicBack = type == constants.VALUE_DIALOG_FLOW_INVESTOR_CNIC
             NomineeCnicBack = type == constants.VALUE_DIALOG_FLOW_NOMINEE_CNIC
-
-
             val pickImage = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
             startActivityForResult(pickImage, IMAGE_PICKER_REQUEST_CODE)
-
-
         }
         btnUploadCNIC.setOnClickListener {
             if (type.equals(constants.VALUE_DIALOG_FLOW_NOMINEE_CNIC)) {
-
                 if (NomineeCnicFrontURI != null && NomineeCnicBackURI != null) {
-
                     lifecycleScope.launch {
-                        //add(NomineeCnicFrontURI!!, NomineeCnicBackURI!!, type)
+                        if (NomineeCnicFrontURI != null && NomineeCnicBackURI != null) { // Additional null check
+                            val frontBitmap = MediaStore.Images.Media.getBitmap(this@ActivityUserDetails.contentResolver, NomineeCnicFrontURI)
+                            val backBitmap = MediaStore.Images.Media.getBitmap(this@ActivityUserDetails.contentResolver, NomineeCnicBackURI)
+                            val frontBase64 = convertImageToBase64(this@ActivityUserDetails, frontBitmap)
+                            val backBase64 = convertImageToBase64(this@ActivityUserDetails, backBitmap)
+                            if (frontBase64 != null && backBase64 != null) { // Check if conversion is successful
+                                dialog.dismiss()
+                                uploadCnicToServer(frontBase64, backBase64,constants.VALUE_DIALOG_FLOW_NOMINEE_CNIC)
+                            } else {
+                                Toast.makeText(mContext, "Error converting images to base64", Toast.LENGTH_SHORT).show()
+                            }
+                        } else {
+                            Toast.makeText(mContext, "Please Select Front and Back Images", Toast.LENGTH_SHORT).show()
+                        }
+
+
                     }
                 } else Toast.makeText(mContext, "Please Select both photos", Toast.LENGTH_SHORT)
                     .show()
 
 
             } else if (type.equals(constants.VALUE_DIALOG_FLOW_INVESTOR_CNIC)) {
-                if (UserCnicFrontURI != null && UserCnicBackURI != null)
+                if (UserCnicFrontURI != null && UserCnicBackURI != null) {
                     lifecycleScope.launch {
-                        // addUserCNIC(UserCnicFrontURI!!, UserCnicBackURI!!, type)
+                        if (UserCnicFrontURI != null && UserCnicBackURI != null) { // Additional null check
+                            val frontBitmap = MediaStore.Images.Media.getBitmap(this@ActivityUserDetails.contentResolver, UserCnicFrontURI)
+                            val backBitmap = MediaStore.Images.Media.getBitmap(this@ActivityUserDetails.contentResolver, UserCnicBackURI)
+
+                            val frontBase64 = convertImageToBase64(this@ActivityUserDetails, frontBitmap)
+                            val backBase64 = convertImageToBase64(this@ActivityUserDetails, backBitmap)
+
+                            if (frontBase64 != null && backBase64 != null) { // Check if conversion is successful
+                                dialog.dismiss()
+                                uploadCnicToServer(frontBase64, backBase64,constants.VALUE_DIALOG_FLOW_INVESTOR_CNIC)
+                            } else {
+                                Toast.makeText(mContext, "Error converting images to base64", Toast.LENGTH_SHORT).show()
+                            }
+                        } else {
+                            Toast.makeText(mContext, "Please Select Front and Back Images", Toast.LENGTH_SHORT).show()
+                        }
                     }
-                else Toast.makeText(mContext, "Please Select Image", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(mContext, "Please Select Front and Back Images", Toast.LENGTH_SHORT).show()
+                }
             }
+
+
+
 
         }
 
         dialog.show()
+    }
+
+    private fun uploadCnicToServer(frontBase64: String, backBase64: String,from:String) {
+        utils.startLoadingAnimation()
+        val stringRequest = object : StringRequest(
+            Request.Method.POST, ApiUrls.ADD_CNIC_API,
+            com.android.volley.Response.Listener { response ->
+                utils.endLoadingAnimation()
+                try {
+                    val jsonObject = JSONObject(response)
+                    val success = jsonObject.optBoolean("success", false)
+                    if (success) {
+                        val message = jsonObject.optString("message", "Image uploaded successfully")
+                        Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
+                        Log.d("UploadImage", "Image uploaded successfully. Response: $jsonObject")
+                    } else {
+                        val errorMessage = jsonObject.optString("message", "Unknown error occurred")
+                        Toast.makeText(mContext, errorMessage, Toast.LENGTH_SHORT).show()
+                        Log.e("UploadImage", "Error occurred during image upload: $errorMessage")
+                    }
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                    Toast.makeText(mContext, "JSON parsing error: ${e.message}", Toast.LENGTH_SHORT).show()
+                    Log.e("UploadImage", "JSON parsing error: ${e.message}")
+                }
+            },
+            com.android.volley.Response.ErrorListener { error ->
+                Toast.makeText(mContext, "Error occurred: ${error.message}", Toast.LENGTH_SHORT).show()
+                utils.endLoadingAnimation()
+                Log.e("VolleyError", "Error: $error")
+            }) {
+
+            override fun getParams(): MutableMap<String, String> {
+                val params = HashMap<String, String>()
+                params["photo_front"] = "data:image/jpeg;base64,$frontBase64"
+                params["photo_back"] = "data:image/jpeg;base64,$backBase64"
+                if("from_investor"==constants.VALUE_DIALOG_FLOW_INVESTOR_CNIC){
+                    params["type"] = "user"
+                }
+                else if("from_nominee"==constants.VALUE_DIALOG_FLOW_NOMINEE_CNIC){
+                    params["type"] = "nominee"
+                }
+                return params
+            }
+
+            override fun getHeaders(): MutableMap<String, String> {
+                val headers = HashMap<String, String>()
+                headers["Authorization"] = "Bearer ${sharedPrefManager.getToken()}"
+                return headers
+            }
+        }
+
+        Volley.newRequestQueue(mContext).add(stringRequest)
+
+
+
     }
 
     fun showAddAccountDialog(type: String) {
@@ -686,7 +744,6 @@ class ActivityUserDetails : AppCompatActivity() {
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.setContentView(R.layout.dialog_add_account)
-
         val tvHeaderBank = dialog.findViewById<TextView>(R.id.tvHeaderBank)
         val tvHeaderBankDisc = dialog.findViewById<TextView>(R.id.tvHeaderBankDisc)
         val spBank = dialog.findViewById<Spinner>(R.id.spBank)
@@ -700,12 +757,8 @@ class ActivityUserDetails : AppCompatActivity() {
         }
 
         btnAddAccount.setOnClickListener {
-
-
             if (etAccountNumber.text.toString().isNotEmpty()) {
-
                 if (etAccountTittle.text.isNotEmpty()) {
-
                     addBankAccount(
                         ReqAddAccount(
                             type,
@@ -729,13 +782,11 @@ class ActivityUserDetails : AppCompatActivity() {
 
     fun showPhotoDialog() {
 
-
         NomineeCnicFront = false
         NomineeCnicBack = false
         UserCnicFront = false
         UserCnicBack = false
         UserProfilePhoto = false
-
         dialog = Dialog(mContext)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -744,7 +795,6 @@ class ActivityUserDetails : AppCompatActivity() {
         imgProfilePhoto = dialog.findViewById<ImageView>(R.id.imgProfilePhoto)
         val tvSelect = dialog.findViewById<TextView>(R.id.tvSelect)
         val btnUplodProfile = dialog.findViewById<Button>(R.id.btnUpload)
-
         tvSelect.setOnClickListener {
             UserProfilePhoto = true
             val pickImage = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
@@ -752,31 +802,15 @@ class ActivityUserDetails : AppCompatActivity() {
         }
 
         btnUplodProfile.setOnClickListener {
-
-
-
-            dialog.dismiss()
-
             if (imageURI != null) {
 
-
-//                lifecycleScope.launch {
-//                    val base64 = convertUriToBase64(imageURI)
-//                    // Use base64 as needed
-//                    Log.d("tag222",base64.toString() )
-//
-//                    Toast.makeText(mContext, "$base64", Toast.LENGTH_SHORT).show()
-//
-//                }
-
-
-
-
-                //convertUriToBase64(imageURI)?.let { it1 -> uploadImage(it1) }
-
-                //imageUriToBase64(mContext, imageURI!!)?.let { photo -> uploadImage(photo) }
-
-
+                imageURI?.let { uri ->
+                    val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, uri)
+                    convertImageToBase64(this, bitmap)?.let {
+                        dialog.dismiss()
+                        uploadImageToServer(it)
+                    }
+                }
 
             } else {
                 Toast.makeText(mContext, "d=2", Toast.LENGTH_SHORT).show()
@@ -788,29 +822,92 @@ class ActivityUserDetails : AppCompatActivity() {
         dialog.show()
     }
 
-    fun addBankAccount(req: ReqAddAccount) {
 
 
+
+    fun convertImageToBase64(context: Context, bitmap:Bitmap): String? {
+        val baos = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+        val imageBytes = baos.toByteArray()
+        val imageString = Base64.encodeToString(imageBytes, Base64.DEFAULT)
+        val file = File(context.filesDir, "base64String.txt")
+        file.writeText(imageString)
+        Log.d("convertImageToBase64", imageString)
+        return imageString
+    }
+
+
+
+
+    private fun uploadImageToServer(photo: String) {
         utils.startLoadingAnimation()
+        val stringRequest = object : StringRequest(
+            Request.Method.POST, ApiUrls.ADD_PHOTO_API,
+            com.android.volley.Response.Listener { response ->
+                utils.endLoadingAnimation()
+                try {
+                    val jsonObject = JSONObject(response)
+                    val success = jsonObject.optBoolean("success", false)
+                    if (success) {
+                        val message = jsonObject.optString("message", "Image uploaded successfully")
+                        Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
+                        Log.d("UploadImage", "Image uploaded successfully. Response: $jsonObject")
+                    } else {
+                        val errorMessage = jsonObject.optString("message", "Unknown error occurred")
+                        Toast.makeText(mContext, errorMessage, Toast.LENGTH_SHORT).show()
+                        Log.e("UploadImage", "Error occurred during image upload: $errorMessage")
+                    }
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                    Toast.makeText(mContext, "JSON parsing error: ${e.message}", Toast.LENGTH_SHORT).show()
+                    Log.e("UploadImage", "JSON parsing error: ${e.message}")
+                }
+            },
+            com.android.volley.Response.ErrorListener { error ->
+                Toast.makeText(mContext, "Error occurred: ${error.message}", Toast.LENGTH_SHORT).show()
+                utils.endLoadingAnimation()
+                Log.e("VolleyError", "Error: $error")
+            }) {
 
+            override fun getParams(): MutableMap<String, String> {
+                val params = HashMap<String, String>()
+                params["photo"] = "data:image/jpeg;base64,$photo"
+                return params
+            }
+
+            override fun getHeaders(): MutableMap<String, String> {
+                val headers = HashMap<String, String>()
+                headers["Authorization"] = "Bearer ${sharedPrefManager.getToken()}"
+                return headers
+            }
+        }
+
+        Volley.newRequestQueue(mContext).add(stringRequest)
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+    fun addBankAccount(req: ReqAddAccount) {
+        utils.startLoadingAnimation()
         val stringRequest = object : StringRequest(
             Request.Method.POST, ApiUrls.ADD_ACCOUNTS_API,
             com.android.volley.Response.Listener { response ->
-                // Handle the response
                 utils.endLoadingAnimation()
-
                 try {
-
                     val jsonObject = JSONObject(response)
-
                     if (jsonObject != null) {
-
                         if (jsonObject.getBoolean("success") == true) {
-
-
                             dialog.dismiss()
-
-
                             Toast.makeText(
                                 mContext,
                                 jsonObject.getString("message").toString(),
@@ -833,7 +930,6 @@ class ActivityUserDetails : AppCompatActivity() {
                 } catch (e: JSONException) {
                     e.printStackTrace()
                     Toast.makeText(mContext, e.message.toString(), Toast.LENGTH_SHORT).show()
-                    // Handle JSON parsing error
                 }
 
 
@@ -852,7 +948,6 @@ class ActivityUserDetails : AppCompatActivity() {
                 params["account_tittle"] = req.account_tittle
                 params["bank_name"] = req.bank_name
                 params["type"] = req.type
-
                 return params
             }
 
@@ -965,7 +1060,6 @@ class ActivityUserDetails : AppCompatActivity() {
         fos.write(bitmapData)
         fos.flush()
         fos.close()
-
         return file
     }
 

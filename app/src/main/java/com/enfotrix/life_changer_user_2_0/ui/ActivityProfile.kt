@@ -118,9 +118,9 @@ class ActivityProfile : AppCompatActivity() {
             layPin.setOnClickListener {
                 showUpdatePinDialog()
             }
-            editName.setOnClickListener {
-                updateNameDialog()
-            }
+//            editName.setOnClickListener {
+//                updateNameDialog()
+//            }
 
             layPhone.setOnClickListener {
                 updatePhone()
@@ -524,6 +524,7 @@ class ActivityProfile : AppCompatActivity() {
         startActivityForResult(intent, REQUEST_IMAGE_PICK)
     }
 
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_IMAGE_PICK && resultCode == Activity.RESULT_OK && data != null) {
@@ -531,9 +532,6 @@ class ActivityProfile : AppCompatActivity() {
             selectedImage?.let { uri ->
                 val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, uri)
                 convertImageToBase64(this, bitmap)?.let { uploadImageToServer(it) }
-                // Do something with the base64String, like sending it over a network or saving it
-                // For now, let's just display it in a toast message
-                //Toast.makeText(this, base64String, Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -558,10 +556,9 @@ class ActivityProfile : AppCompatActivity() {
                         if(jsonObject.getBoolean("success")==true){
 
                             Toast.makeText(mContext, jsonObject.toString(), Toast.LENGTH_SHORT).show()
+                            Log.d("outPut", "uploadImageToServer: ${jsonObject.toString()}")
 
                         }
-
-
                         else if(jsonObject.getBoolean("success")==false) {
 
                             var error= jsonObject.getString("message")
@@ -592,7 +589,8 @@ class ActivityProfile : AppCompatActivity() {
             // Override getParams() to add POST parameters
             override fun getParams(): MutableMap<String, String> {
                 val params = HashMap<String, String>()
-                params["photo"] = photo
+                "data:image/jpeg;base64,$photo"
+                params["photo"] = "data:image/jpeg;base64,$photo"
 
                 return params
             }

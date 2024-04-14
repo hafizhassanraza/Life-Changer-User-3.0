@@ -13,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.enfotrix.life_changer_user_2_0.ApiUrls
 import com.enfotrix.life_changer_user_2_0.Constants
 import com.enfotrix.life_changer_user_2_0.Data.Repo
 import com.enfotrix.life_changer_user_2_0.Models.ModelNominee
@@ -96,16 +97,13 @@ class ActivityNominee : AppCompatActivity() {
     fun saveNominee(nominee:ModelNominee){
 
         utils.startLoadingAnimation()
-        val url = "http://192.168.0.103:8000/api/add-nominee"
 
         val stringRequest = object : StringRequest(
-            Request.Method.POST, url,
+            Request.Method.POST, ApiUrls.ADD_NOMINEE_API,
             com.android.volley.Response.Listener { response ->
-                // Handle the response
                 utils.endLoadingAnimation()
 
                 try {
-
                     val jsonObject = JSONObject(response)
 
                     if(jsonObject!=null){
@@ -124,6 +122,7 @@ class ActivityNominee : AppCompatActivity() {
 
 
                         }
+
                         else if(jsonObject.getBoolean("success")==false) {
 
                             utils.endLoadingAnimation()
@@ -143,10 +142,9 @@ class ActivityNominee : AppCompatActivity() {
 
             },
             com.android.volley.Response.ErrorListener { error ->
-                // Handle errors
+
                 utils.endLoadingAnimation()
                 Toast.makeText(mContext, "Response: ${error.message}", Toast.LENGTH_SHORT).show()
-
                 Log.e("VolleyError", "Error: $error")
             }) {
             // Override getParams() to add POST parameters
