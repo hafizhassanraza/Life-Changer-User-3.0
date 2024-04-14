@@ -39,8 +39,11 @@ import org.json.JSONException
 import org.json.JSONObject
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
+import android.provider.MediaStore
 import android.text.Editable
 import android.util.Base64
+import androidx.core.content.ContextCompat
 import com.android.volley.DefaultRetryPolicy
 import com.android.volley.NetworkResponse
 
@@ -48,12 +51,17 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.enfotrix.life_changer_user_2_0.api.DataPart
 import com.enfotrix.life_changer_user_2_0.api.VolleyMultipartRequest
 import java.io.ByteArrayOutputStream
+import java.io.File
 import java.nio.ByteBuffer
 
 
 //class ActivityProfile(method: Int, mListener: Response.Listener<NetworkResponse>) : AppCompatActivity() {
 class ActivityProfile : AppCompatActivity() {
 
+
+    companion object {
+        private const val REQUEST_IMAGE_PICK = 100
+    }
     private val db = Firebase.firestore
     private lateinit var utils: Utils
     private lateinit var investor:User
@@ -103,6 +111,8 @@ class ActivityProfile : AppCompatActivity() {
 
 
 
+
+
                 openGallery()
             }
             layPin.setOnClickListener {
@@ -123,6 +133,30 @@ class ActivityProfile : AppCompatActivity() {
         }
 
 
+    }
+
+    fun convertImageToBase64(context: Context, bitmap:Bitmap): String? {
+        val baos = ByteArrayOutputStream()
+        /*val bitmapDrawable = ContextCompat.getDrawable(context, R.drawable.logo)
+        if (bitmapDrawable == null) {
+            Log.e("convertImageToBase64", "Drawable resource not found")
+            return null
+        }
+        val bitmap = (bitmapDrawable as BitmapDrawable).bitmap
+        if (bitmap == null) {
+            Log.e("convertImageToBase64", "Bitmap could not be decoded")
+            return null
+        }*/
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+        val imageBytes = baos.toByteArray()
+        val imageString = Base64.encodeToString(imageBytes, Base64.DEFAULT)
+
+        // Save the Base64 string to a file
+        val file = File(context.filesDir, "base64String.txt")
+        file.writeText(imageString)
+
+        Log.d("convertImageToBase64", imageString)
+        return imageString
     }
 
     fun bitmapToByteArray(bitmap: Bitmap): ByteArray {
@@ -483,28 +517,112 @@ class ActivityProfile : AppCompatActivity() {
     }
 
 
-    fun openGallery() {
-        val intent = Intent(Intent.ACTION_PICK)
-        intent.type = "image/*"
-        startActivityForResult(intent, PICK_IMAGE_REQUEST)
+
+
+    private fun openGallery() {
+        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        startActivityForResult(intent, REQUEST_IMAGE_PICK)
     }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK) {
-            data?.data?.let { selectedImageUri ->
-                val inputStream = contentResolver.openInputStream(selectedImageUri)
-                val selectedImageBitmap = BitmapFactory.decodeStream(inputStream)
-                uploadImageToServer(selectedImageBitmap)
+        if (requestCode == REQUEST_IMAGE_PICK && resultCode == Activity.RESULT_OK && data != null) {
+            val selectedImage = data.data
+            selectedImage?.let { uri ->
+                val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, uri)
+                convertImageToBase64(this, bitmap)?.let { uploadImageToServer(it) }
+                // Do something with the base64String, like sending it over a network or saving it
+                // For now, let's just display it in a toast message
+                //Toast.makeText(this, base64String, Toast.LENGTH_LONG).show()
             }
         }
     }
 
+    private fun uploadImageToServer(photo: String) {
+
+
+        utils.startLoadingAnimation()
+
+        val stringRequest = object : StringRequest(
+            Request.Method.POST, ApiUrls.ADD_PHOTO_API,
+            Response.Listener { response ->
+                // Handle the response
+                utils.endLoadingAnimation()
+
+                try {
+
+                    val jsonObject = JSONObject(response)
+
+                    if(jsonObject!=null){
+
+                        if(jsonObject.getBoolean("success")==true){
+
+                            Toast.makeText(mContext, jsonObject.toString(), Toast.LENGTH_SHORT).show()
+
+                        }
+
+
+                        else if(jsonObject.getBoolean("success")==false) {
+
+                            var error= jsonObject.getString("message")
+                            Toast.makeText(mContext, error, Toast.LENGTH_SHORT).show()
+                        }
+
+
+
+                    }
+
+
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                    Toast.makeText(mContext, e.message.toString(), Toast.LENGTH_SHORT).show()
+                    // Handle JSON parsing error
+                }
+
+
+
+            },
+            Response.ErrorListener { error ->
+                // Handle errors
+                utils.endLoadingAnimation()
+                Toast.makeText(mContext, "Response: ${error.message}", Toast.LENGTH_SHORT).show()
+
+                Log.e("VolleyError", "Error: $error")
+            }) {
+            // Override getParams() to add POST parameters
+            override fun getParams(): MutableMap<String, String> {
+                val params = HashMap<String, String>()
+                params["photo"] = photo
+
+                return params
+            }
+            /*override fun getParams(): MutableMap<String, String> {
+                return hashMapOf(
+                    "name" to req.name,
+                    "cnic" to req.cnic,
+                    "pin" to req.pin,
+                    "address" to req.address,
+                    "phone" to req.phone,
+                    "father_name" to req.father_name
+                )
+            }*/
+
+        }
+
+
+        Volley.newRequestQueue(mContext).add(stringRequest)
+
+
+
+
+
+    }
 
 
     private fun getUser() {
 
 
-utils.startLoadingAnimation()
+    utils.startLoadingAnimation()
         val stringRequest = object : StringRequest(
             Request.Method.POST, ApiUrls.USER_DATA_API,
             com.android.volley.Response.Listener { response ->
@@ -579,64 +697,68 @@ utils.startLoadingAnimation()
 
 
 
-    private fun uploadImageToServer(photoBitmap: Bitmap) {
-        utils.startLoadingAnimation()
-
-        val url = "http://192.168.0.103:8000/api/test-photo"
+    /*private fun uploadImageToServer(photo: Bitmap) {
 
 
 
 
+             utils.startLoadingAnimation()
 
-        uploadImage(photoBitmap, url,
-            onSuccess = { response ->
-                utils.endLoadingAnimation()
-                try {
+             val url = "http://192.168.0.103:8000/api/test-photo"
 
 
 
-                    if (response != null) {
-
-                        if (response.getBoolean("success") == true) {
 
 
-                            Log.e("t2", response.getString("data").toString())
-//                            Toast.makeText(mContext, response.getString("data").toString(), Toast.LENGTH_SHORT).show()
+             uploadImage(photo, url,
+                 onSuccess = { response ->
+                     utils.endLoadingAnimation()
+                     try {
 
 
 
-                        } else if (response.getBoolean("success") == false) {
+                         if (response != null) {
 
-                            var error = response.getString("message")
-                            Toast.makeText(mContext, " ${error}", Toast.LENGTH_SHORT).show()
-                        }
-
-                    }
+                             if (response.getBoolean("success") == true) {
 
 
-                } catch (e: JSONException) {
-                    e.printStackTrace()
-                    Toast.makeText(mContext, e.message.toString(), Toast.LENGTH_SHORT).show()
-                    // Handle JSON parsing error
-                }
+                                 Log.e("t2", response.getString("data").toString())
+     //                            Toast.makeText(mContext, response.getString("data").toString(), Toast.LENGTH_SHORT).show()
 
 
-//                Toast.makeText(mContext, "d1"+response.toString(), Toast.LENGTH_SHORT).show()
-                // Handle success response
-                // You can parse the response JSON object here
-            },
-            onError = { error ->
-                utils.endLoadingAnimation()
-                Toast.makeText(mContext, "d2"+error.toString(), Toast.LENGTH_SHORT).show()
 
-                // Handle error
-            })
+                             } else if (response.getBoolean("success") == false) {
+
+                                 var error = response.getString("message")
+                                 Toast.makeText(mContext, " ${error}", Toast.LENGTH_SHORT).show()
+                             }
+
+                         }
 
 
-    }
+                     } catch (e: JSONException) {
+                         e.printStackTrace()
+                         Toast.makeText(mContext, e.message.toString(), Toast.LENGTH_SHORT).show()
+                         // Handle JSON parsing error
+                     }
+
+
+                 },
+                 onError = { error ->
+                     utils.endLoadingAnimation()
+                     Toast.makeText(mContext, "d2"+error.toString(), Toast.LENGTH_SHORT).show()
+
+                     // Handle error
+                 })
+
+
+    }*/
 
     // uploadImage function
-    fun uploadImage(bitmap: Bitmap, url: String, onSuccess: (response: JSONObject) -> Unit, onError: (error: String) -> Unit) {
+
+
+    // uploadImage function
+    /*fun uploadImage(bitmap: Bitmap, url: String, onSuccess: (response: JSONObject) -> Unit, onError: (error: String) -> Unit) {
 
         val byteArrayOutputStream = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
@@ -668,7 +790,7 @@ utils.startLoadingAnimation()
         )
 
         Volley.newRequestQueue(mContext).add(request)
-    }
+    }*/
 
 
 
