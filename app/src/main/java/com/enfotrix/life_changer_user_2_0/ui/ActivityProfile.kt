@@ -5,11 +5,15 @@ import android.app.Activity
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.MediaStore
+import android.text.Editable
+import android.util.Base64
 import android.util.Log
 import android.view.Window
 import android.widget.Button
@@ -17,6 +21,7 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
@@ -37,20 +42,6 @@ import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
 import org.json.JSONException
 import org.json.JSONObject
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.drawable.BitmapDrawable
-import android.provider.MediaStore
-import android.text.Editable
-import android.util.Base64
-import androidx.core.content.ContextCompat
-import com.android.volley.DefaultRetryPolicy
-import com.android.volley.NetworkResponse
-
-import com.android.volley.toolbox.JsonObjectRequest
-import com.enfotrix.life_changer_user_2_0.StaticEnvironment
-import com.enfotrix.life_changer_user_2_0.api.DataPart
-import com.enfotrix.life_changer_user_2_0.api.VolleyMultipartRequest
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.nio.ByteBuffer
@@ -71,8 +62,8 @@ class ActivityProfile : AppCompatActivity() {
     private lateinit var constants: Constants
     private val PICK_IMAGE_REQUEST = 1
     private lateinit var repo: Repo
-
-
+    private val MAX_IMAGE_SIZE_BYTES: Long = 2 * 1024 * 1024
+    private val COMPRESSION_QUALITY = 80
 
     private lateinit var user_: ModelUser
     private lateinit var sharedPrefManager: SharedPrefManager
@@ -286,10 +277,10 @@ class ActivityProfile : AppCompatActivity() {
         btnSetPin.setOnClickListener {
             val completePin = "${pin1.text}${pin2.text}${pin3.text}${pin4.text}${pin5.text}${pin6.text}"
 
-                if (completePin.contains("-")&& completePin.length<6) {
-                    Toast.makeText(mContext, "Enter valid pin", Toast.LENGTH_SHORT).show()
-                } else {
-                    updatePin(completePin)
+            if (completePin.contains("-")&& completePin.length<6) {
+                Toast.makeText(mContext, "Enter valid pin", Toast.LENGTH_SHORT).show()
+            } else {
+                updatePin(completePin)
 
 
             }
@@ -519,15 +510,38 @@ class ActivityProfile : AppCompatActivity() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         startActivityForResult(intent, REQUEST_IMAGE_PICK)
     }
+    private fun compressImage(bitmap: Bitmap): Bitmap {
+        val stream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, COMPRESSION_QUALITY, stream)
+        val byteArray = stream.toByteArray()
+        return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+    }
 
+
+    private fun isImageSizeValid(uri: Uri): Boolean {
+        val inputStream = contentResolver.openInputStream(uri)
+        val size = inputStream?.available()?.toLong() ?: 0
+        inputStream?.close()
+        return size <= MAX_IMAGE_SIZE_BYTES
+    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_IMAGE_PICK && resultCode == Activity.RESULT_OK && data != null) {
             val selectedImage = data.data
             selectedImage?.let { uri ->
-                val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, uri)
-                convertImageToBase64(this, bitmap)?.let { uploadImageToServer(it) }
+                val inputStream = contentResolver.openInputStream(uri)
+                val size = inputStream?.available()?.toLong() ?: 0
+                inputStream?.close()
+                if (size > MAX_IMAGE_SIZE_BYTES) {
+                    // Image size exceeds limit, compress it
+                    val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, uri)
+                    val compressedBitmap = compressImage(bitmap)
+                    convertImageToBase64(this, compressedBitmap)?.let { uploadImageToServer(it) }
+                } else {
+                    val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, uri)
+                    convertImageToBase64(this, bitmap)?.let { uploadImageToServer(it) }
+                }
             }
         }
     }
@@ -582,7 +596,7 @@ class ActivityProfile : AppCompatActivity() {
     private fun getUser() {
 
 
-    utils.startLoadingAnimation()
+        utils.startLoadingAnimation()
         val stringRequest = object : StringRequest(
             Request.Method.POST, ApiUrls.USER_DATA_API,
             com.android.volley.Response.Listener { response ->
