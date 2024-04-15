@@ -20,5 +20,6 @@ object ApiUrls {
     const val UPDATE_PROFILE_API = "$base/api/update-profile"
     const val ADD_NOMINEE_API = "$base/api/add-nominee"
     const val ADD_CNIC_API = "$base/api/add-cnic-photo"
+    const val CONTECT_US_API = "$base/api/contact-us"
 
 }

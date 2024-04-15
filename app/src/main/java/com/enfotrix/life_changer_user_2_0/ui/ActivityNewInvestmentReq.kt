@@ -329,16 +329,8 @@ class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.On
             val pickImage = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
             startActivityForResult(pickImage, IMAGE_PICKER_REQUEST_CODE)
             image.setImageURI(imageURI)
-
-
             dialogAddA.dismiss()
         }
-
-
-
-
-
-
         dialogAddA.show()
     }
 
@@ -440,10 +432,8 @@ class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.On
             Response.Listener { response ->
                 utils.endLoadingAnimation()
                 try {
-
                     val jsonObject = JSONObject(response)
                     if(jsonObject!=null){
-
                         if(jsonObject.getBoolean("success")==true){
                             Toast.makeText(mContext, "Investment Req. Sent!", Toast.LENGTH_SHORT).show()
                             startActivity(Intent(mContext,MainActivity::class.java)
@@ -475,10 +465,8 @@ class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.On
 
             },
             Response.ErrorListener { error ->
-                // Handle errors
                 utils.endLoadingAnimation()
                 Toast.makeText(mContext, "Response: ${error.message}", Toast.LENGTH_SHORT).show()
-
                 Log.e("VolleyError", "Error: $error")
             }) {
             // Override getParams() to add POST parameters
@@ -522,7 +510,6 @@ class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.On
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.setContentView(R.layout.dialog_add_balance)
-
         val etBalance = dialog.findViewById<EditText>(R.id.etBalance)
         val btnAddBalance = dialog.findViewById<Button>(R.id.btnAddBalance)
 
@@ -557,15 +544,11 @@ class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.On
                 val size = inputStream?.available()?.toLong() ?: 0
                 inputStream?.close()
                 if (size > MAX_IMAGE_SIZE_BYTES) {
-                    // Image size exceeds limit, compress it
                     val compressedBitmap = compressImage(uri)
-                    // Set compressed image to ImageView
                     binding.imgRecieptTransaction.setImageBitmap(compressedBitmap)
                 } else {
-                    // Image size is within limit, proceed without compression
                     binding.imgRecieptTransaction.setImageURI(uri)
                 }
-                // Store the selected image URI
                 imageURI = uri
             }
         }

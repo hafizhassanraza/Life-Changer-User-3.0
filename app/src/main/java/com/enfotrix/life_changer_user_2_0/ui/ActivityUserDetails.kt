@@ -719,9 +719,6 @@ class ActivityUserDetails : AppCompatActivity() {
                         }
                         val message = jsonObject.optString("message", "Image uploaded successfully")
                         Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
-
-
-
                         Log.d("UploadImage", "Image uploaded successfully. Response: $jsonObject")
 
                     } else {
@@ -809,8 +806,7 @@ class ActivityUserDetails : AppCompatActivity() {
         dialog.show()
     }
 
-    fun showPhotoDialog() {
-
+    private fun showPhotoDialog() {
         NomineeCnicFront = false
         NomineeCnicBack = false
         UserCnicFront = false
@@ -845,7 +841,6 @@ class ActivityUserDetails : AppCompatActivity() {
 
 
         }
-
         dialog.show()
     }
 

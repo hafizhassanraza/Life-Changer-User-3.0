@@ -290,7 +290,6 @@ class ActivityProfile : AppCompatActivity() {
     }
 
     private fun updatePin(completePin: String) {
-
         utils.startLoadingAnimation()
         val stringRequest = object : StringRequest(
             Request.Method.POST, ApiUrls.UPDATE_PROFILE_API,
@@ -806,7 +805,6 @@ class ActivityProfile : AppCompatActivity() {
             Response.Listener { response ->
                 // Handle the response
                 utils.endLoadingAnimation()
-
                 try {
 
                     val jsonObject = JSONObject(response)

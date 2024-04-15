@@ -10,6 +10,7 @@ import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.AdapterView
@@ -20,10 +21,17 @@ import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
+import com.enfotrix.life_changer_user_2_0.ApiUrls
 import com.enfotrix.life_changer_user_2_0.Constants
 import com.enfotrix.life_changer_user_2_0.Data.Repo
 import com.enfotrix.life_changer_user_2_0.Models.ContactUsModel
+import com.enfotrix.life_changer_user_2_0.Models.Contact_UsModel
+import com.enfotrix.life_changer_user_2_0.Models.ModelUser
 import com.enfotrix.life_changer_user_2_0.Models.UserViewModel
 import com.enfotrix.life_changer_user_2_0.R
 import com.enfotrix.life_changer_user_2_0.SharedPrefManager
@@ -32,6 +40,9 @@ import com.enfotrix.life_changer_user_2_0.databinding.ActivityNavDrawerBinding
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
+import com.google.gson.Gson
+import org.json.JSONException
+import org.json.JSONObject
 
 class ActivityNavDrawer : AppCompatActivity() {
 
@@ -55,6 +66,7 @@ class ActivityNavDrawer : AppCompatActivity() {
     var listwhatsapp=ArrayList<String>()
     var listmail=ArrayList<String>()
     var listPhoneNumber=ArrayList<String>()
+    var designatorList=ArrayList<Contact_UsModel>()
 
     private lateinit var user: User
     private lateinit var sharedPrefManager: SharedPrefManager
@@ -82,7 +94,7 @@ class ActivityNavDrawer : AppCompatActivity() {
         //dialog intilization.
         dialog = Dialog(mContext)
         dialog.setContentView(R.layout.dialog_for_contact_us)
-
+        getContactList()
         binding.layInvestorAccount.setOnClickListener {
             startActivity(Intent(mContext, ActivityInvestorAccounts::class.java))
         }
@@ -123,54 +135,6 @@ class ActivityNavDrawer : AppCompatActivity() {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-        var list=ArrayList<ContactUsModel>()
-        db.collection("ContactUs").get()
-            .addOnSuccessListener { querySnapshot ->
-                // Clear the existing list to avoid duplicates
-                list.clear()
-                for (document in querySnapshot.documents) {
-                    val contactUsModel = document.toObject<ContactUsModel>()
-                    if (contactUsModel != null) {
-                        // Add the UserData object to the list
-                        list.add(contactUsModel)
-                    }
-                }
-
-                for(doc in list){
-                    listDesignation.add(doc.designation)
-                }
-
-                for(doc in list){
-                    listwhatsapp.add(doc.wa)
-                }
-                for(doc in list){
-                    listmail.add(doc.email)
-                }
-                for(doc in list){
-                    listPhoneNumber.add(doc.mobile)
-                }
-
-
-
-
-
-
-            }.addOnFailureListener{ exception->
-                Toast.makeText(mContext, "Error", Toast.LENGTH_SHORT).show()
-            }
-
         val whatsapp = dialog.findViewById<ImageView>(R.id.whatsapp)
         val mail = dialog.findViewById<ImageView>(R.id.mail)
         val phone = dialog.findViewById<ImageView>(R.id.dailor)
@@ -197,33 +161,80 @@ class ActivityNavDrawer : AppCompatActivity() {
     }
 
 
+    private fun getContactList() {
+        utils.startLoadingAnimation()
+
+        val stringRequest = object : StringRequest(
+            Request.Method.POST, ApiUrls.CONTECT_US_API,
+            Response.Listener { response ->
+                utils.endLoadingAnimation()
+                try {
+                    val jsonObject = JSONObject(response)
+                    if (jsonObject.getBoolean("success")) {
+                        val gson = Gson()
+                        val dataJson = jsonObject.optJSONObject("data")
+                        if (dataJson != null) {
+                            val data: Contact_UsModel = gson.fromJson(dataJson.toString(), Contact_UsModel::class.java)
+                            designatorList = mutableListOf(data) as ArrayList<Contact_UsModel>
+
+                            // Assuming contacts is the correct field name, adjust accordingly
+                            // setData(accountsList)
+                        } else {
+                            // Handle missing data field
+                            Toast.makeText(mContext, "Data not found in response", Toast.LENGTH_SHORT).show()
+                        }
+                    } else {
+                        val error = jsonObject.getString("message")
+                        Toast.makeText(mContext, error, Toast.LENGTH_SHORT).show()
+                    }
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                    Toast.makeText(mContext, "JSON Parsing Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            },
+            Response.ErrorListener { error ->
+                utils.endLoadingAnimation()
+                Toast.makeText(mContext, "Volley Error: ${error.message}", Toast.LENGTH_SHORT).show()
+                Log.e("VolleyError", "Error: $error")
+            }) {
+
+            override fun getHeaders(): MutableMap<String, String> {
+                val headers = HashMap<String, String>()
+                headers["Authorization"] = "Bearer ${sharedPrefManager.getToken()}"
+                return headers
+            }
+        }
+
+        Volley.newRequestQueue(mContext).add(stringRequest)
+    }
+
+
+
+
+
+
+
+
+
 
     private fun showContactDialog() {
         dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.setCancelable(true)
         val spinnerWithdrawType = dialog.findViewById<Spinner>(R.id.spinnerWithdrawType)
         if (listDesignation.isNotEmpty()) {
-            val adapter = ArrayAdapter(mContext, R.layout.custom_spinner,listDesignation)
+            val adapter = ArrayAdapter(mContext, R.layout.custom_spinner,designatorList)
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             spinnerWithdrawType.adapter = adapter
-
-
             spinnerWithdrawType.setSelection(0) // Set the first index as the selected value
             spinnerWithdrawType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                    val selectedDesignator = listDesignation[position]
-                    val designator=dialog.findViewById<TextView>(R.id.designator)
-                    designator.setText(selectedDesignator)
-
-
-
-                    designatorWhatsapp = listwhatsapp.get(position)
-                    designatorMail=listmail.get(position)
-                    designatorPhone=listPhoneNumber.get(position)
-
-
-
-                }
+                   val selectedDesignator = designatorList[position]
+                   val designator=dialog.findViewById<TextView>(R.id.designator)
+                   designator.setText(selectedDesignator.designation)
+                 designatorWhatsapp = selectedDesignator.whatsapp
+                   designatorMail=selectedDesignator.email
+                    designatorPhone=selectedDesignator.mobile
+    }
                 override fun onNothingSelected(parent: AdapterView<*>?) {
 
                 }
