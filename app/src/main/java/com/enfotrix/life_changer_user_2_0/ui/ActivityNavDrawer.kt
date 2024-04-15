@@ -31,6 +31,7 @@ import com.enfotrix.life_changer_user_2_0.Constants
 import com.enfotrix.life_changer_user_2_0.Data.Repo
 import com.enfotrix.life_changer_user_2_0.Models.ContactUsModel
 import com.enfotrix.life_changer_user_2_0.Models.Contact_UsModel
+import com.enfotrix.life_changer_user_2_0.Models.ModelBankAccount
 import com.enfotrix.life_changer_user_2_0.Models.ModelUser
 import com.enfotrix.life_changer_user_2_0.Models.UserViewModel
 import com.enfotrix.life_changer_user_2_0.R
@@ -41,6 +42,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import org.json.JSONException
 import org.json.JSONObject
 
@@ -66,7 +68,8 @@ class ActivityNavDrawer : AppCompatActivity() {
     var listwhatsapp=ArrayList<String>()
     var listmail=ArrayList<String>()
     var listPhoneNumber=ArrayList<String>()
-    var designatorList=ArrayList<Contact_UsModel>()
+    private lateinit var designatorList: List<Contact_UsModel>
+
 
     private lateinit var user: User
     private lateinit var sharedPrefManager: SharedPrefManager
@@ -168,24 +171,37 @@ class ActivityNavDrawer : AppCompatActivity() {
             Request.Method.POST, ApiUrls.CONTECT_US_API,
             Response.Listener { response ->
                 utils.endLoadingAnimation()
+
                 try {
                     val jsonObject = JSONObject(response)
-                    if (jsonObject.getBoolean("success")) {
-                        val gson = Gson()
-                        val dataJson = jsonObject.optJSONObject("data")
-                        if (dataJson != null) {
-                            val data: Contact_UsModel = gson.fromJson(dataJson.toString(), Contact_UsModel::class.java)
-                            designatorList = mutableListOf(data) as ArrayList<Contact_UsModel>
 
-                            // Assuming contacts is the correct field name, adjust accordingly
-                            // setData(accountsList)
-                        } else {
-                            // Handle missing data field
-                            Toast.makeText(mContext, "Data not found in response", Toast.LENGTH_SHORT).show()
+                    if (jsonObject != null) {
+
+                        if (jsonObject.getBoolean("success") == true) {
+
+
+
+                            val gson = Gson()
+                            val contacts: List<Contact_UsModel> = gson.fromJson(
+                                jsonObject.getJSONArray("data").toString(),
+                                object : TypeToken<List<Contact_UsModel>>() {}.type
+                            )
+
+
+                            designatorList= contacts
+
+                            //Toast.makeText(mContext, designatorList.size.toString(), Toast.LENGTH_SHORT).show()
+
+
+
+
+
+                        } else if (jsonObject.getBoolean("success") == false) {
+
+                            var error = jsonObject.getString("message")
+                            Toast.makeText(mContext, " ${error}", Toast.LENGTH_SHORT).show()
                         }
-                    } else {
-                        val error = jsonObject.getString("message")
-                        Toast.makeText(mContext, error, Toast.LENGTH_SHORT).show()
+
                     }
                 } catch (e: JSONException) {
                     e.printStackTrace()
@@ -198,11 +214,7 @@ class ActivityNavDrawer : AppCompatActivity() {
                 Log.e("VolleyError", "Error: $error")
             }) {
 
-            override fun getHeaders(): MutableMap<String, String> {
-                val headers = HashMap<String, String>()
-                headers["Authorization"] = "Bearer ${sharedPrefManager.getToken()}"
-                return headers
-            }
+
         }
 
         Volley.newRequestQueue(mContext).add(stringRequest)
@@ -221,19 +233,21 @@ class ActivityNavDrawer : AppCompatActivity() {
         dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.setCancelable(true)
         val spinnerWithdrawType = dialog.findViewById<Spinner>(R.id.spinnerWithdrawType)
-        if (listDesignation.isNotEmpty()) {
+        if (designatorList.isNotEmpty()) {
             val adapter = ArrayAdapter(mContext, R.layout.custom_spinner,designatorList)
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             spinnerWithdrawType.adapter = adapter
             spinnerWithdrawType.setSelection(0) // Set the first index as the selected value
             spinnerWithdrawType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                   val selectedDesignator = designatorList[position]
                    val designator=dialog.findViewById<TextView>(R.id.designator)
-                   designator.setText(selectedDesignator.designation)
-                 designatorWhatsapp = selectedDesignator.whatsapp
-                   designatorMail=selectedDesignator.email
-                    designatorPhone=selectedDesignator.mobile
+
+
+
+                   designator.setText(designatorList[position].designation)
+                    designatorWhatsapp = designatorList[position].whatsapp
+                   designatorMail=designatorList[position].email
+                    designatorPhone=designatorList[position].mobile
     }
                 override fun onNothingSelected(parent: AdapterView<*>?) {
 

@@ -222,7 +222,6 @@ class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.On
 
         }
 
-
         Volley.newRequestQueue(mContext).add(stringRequest)
 
 
@@ -233,9 +232,6 @@ class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.On
 
 
     private fun getAdminAccount() {
-
-
-
         utils.startLoadingAnimation()
 
         val stringRequest = object : StringRequest(
@@ -476,7 +472,7 @@ class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.On
                 params["receiver_account_id"] = adminAccountID
                 params["sender_account_id"] = accountID
                 params["type"] =constants.TRANSACTION_TYPE_INVESTMENT
-                params["receipt"] =  "data:image/jpeg;base64,$receipt"
+                //params["receipt"] =  "data:image/jpeg;base64,$receipt"
                 return params
             }
             override fun getHeaders(): MutableMap<String, String> {

@@ -266,9 +266,9 @@ class ActivityNewWithdrawReq : AppCompatActivity(), InvestorAccountsAdapter.OnIt
     }
 
 
-    fun addAccountDialog(view: View) {
+    fun addAccountDialog(view: View){
 
-        dialogAddA = Dialog(mContext)
+        dialogAddA = Dialog (mContext)
         dialogAddA.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialogAddA.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialogAddA.setContentView(R.layout.dialog_add_account)
@@ -279,14 +279,20 @@ class ActivityNewWithdrawReq : AppCompatActivity(), InvestorAccountsAdapter.OnIt
         val etAccountNumber = dialogAddA.findViewById<EditText>(R.id.etAccountNumber)
         val btnAddAccount = dialogAddA.findViewById<Button>(R.id.btnAddAccount)
         btnAddAccount.setOnClickListener {
-            updateInvestorBankList(
-                ReqAddAccount(
-                    "user",
-                    spBank.selectedItem.toString(),
-                    etAccountTittle.text.toString(),
-                    etAccountNumber.text.toString(),
+
+            if(etAccountTittle.text.isNotEmpty()||etAccountNumber.text.isNotEmpty()) {
+                updateInvestorBankList(
+                    ReqAddAccount(
+                        "user",
+                        spBank.selectedItem.toString(),
+                        etAccountTittle.text.toString(),
+                        etAccountNumber.text.toString(),
+                    )
                 )
-            )
+            }
+            else
+                Toast.makeText(mContext, "Please ,enter All fields!!", Toast.LENGTH_SHORT).show()
+
         }
         dialogAddA.show()
 
