@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
@@ -56,6 +57,8 @@ class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.On
 
     private lateinit var userAccounts: List<ModelBankAccount>
     private lateinit var adminAccounts: List<ModelBankAccount>
+    private val MAX_IMAGE_SIZE_BYTES: Long = 2 * 1024 * 1024
+    private val COMPRESSION_QUALITY = 80
 
     private lateinit var utils: Utils
     private lateinit var mContext: Context
@@ -546,15 +549,36 @@ class ActivityNewInvestmentReq : AppCompatActivity(), InvestorAccountsAdapter.On
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+
         if (requestCode == IMAGE_PICKER_REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null) {
-            imageURI = data.data!!
-
-            binding.imgRecieptTransaction.setImageURI(imageURI)
-
-
-//            binding.imgRecieptTransaction.setImageURI(imageURI)
+            val selectedImageUri = data.data
+            selectedImageUri?.let { uri ->
+                val inputStream = contentResolver.openInputStream(uri)
+                val size = inputStream?.available()?.toLong() ?: 0
+                inputStream?.close()
+                if (size > MAX_IMAGE_SIZE_BYTES) {
+                    // Image size exceeds limit, compress it
+                    val compressedBitmap = compressImage(uri)
+                    // Set compressed image to ImageView
+                    binding.imgRecieptTransaction.setImageBitmap(compressedBitmap)
+                } else {
+                    // Image size is within limit, proceed without compression
+                    binding.imgRecieptTransaction.setImageURI(uri)
+                }
+                // Store the selected image URI
+                imageURI = uri
+            }
         }
     }
+
+    private fun compressImage(uri: Uri): Bitmap {
+        val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
+        val outputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, COMPRESSION_QUALITY, outputStream)
+        val compressedByteArray = outputStream.toByteArray()
+        return BitmapFactory.decodeByteArray(compressedByteArray, 0, compressedByteArray.size)
+    }
+
 
     fun getAccounts(from: String) {
 

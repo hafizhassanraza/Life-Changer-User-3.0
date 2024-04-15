@@ -22,7 +22,7 @@ data class ModelUser (
     val nominees: ModelNominee,
     val accounts: List<ModelBankAccount>,
     val investment: InvestmentModel,
-    val lc_user: String
+    val lc_id: String
 
 
 )

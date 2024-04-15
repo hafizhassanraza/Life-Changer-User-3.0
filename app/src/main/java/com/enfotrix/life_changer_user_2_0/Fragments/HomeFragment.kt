@@ -502,8 +502,8 @@ class HomeFragment : Fragment() {
     private fun setData(user:ModelUser) {
         binding.tvAnnouncement.text=sharedPrefManager.getAnnouncement().announcement
         binding.tvUserName.text= sharedPrefManager.getUser().name
-        binding.img1.text = user.lc_user ?: "--"
-        binding.img1.setTextColor(if (user.lc_user.isNullOrEmpty()) Color.WHITE else Color.BLACK)
+        binding.img1.text = user.lc_id ?: "--"
+        binding.img1.setTextColor(if (user.lc_id.isNullOrEmpty()) Color.WHITE else Color.BLACK)
 
 
         //binding.uName.text= sharedPrefManager.getUser().firstName

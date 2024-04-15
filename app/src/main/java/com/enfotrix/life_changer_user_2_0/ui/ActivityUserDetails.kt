@@ -101,7 +101,8 @@ class ActivityUserDetails : AppCompatActivity() {
     private lateinit var user: User
     private lateinit var sharedPrefManager: SharedPrefManager
     private lateinit var dialog: Dialog
-
+    private val MAX_IMAGE_SIZE_BYTES: Long = 2 * 1024 * 1024
+    private val COMPRESSION_QUALITY = 80
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -351,36 +352,71 @@ class ActivityUserDetails : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == IMAGE_PICKER_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            when {
-                UserCnicFront -> {
-                    UserCnicFrontURI = data?.data
-                    imgSelectCnicFront.setImageResource(R.drawable.check_small)
-                }
-
-                UserCnicBack -> {
-                    UserCnicBackURI = data?.data
-                    imgSelectCnicBack.setImageResource(R.drawable.check_small)
-                }
-
-                NomineeCnicFront -> {
-                    NomineeCnicFrontURI = data?.data
-                    imgSelectCnicFront.setImageResource(R.drawable.check_small)
-                }
-
-                NomineeCnicBack -> {
-                    NomineeCnicBackURI = data?.data
-                    imgSelectCnicBack.setImageResource(R.drawable.check_small)
-                }
-
-                UserProfilePhoto -> {
-                    Glide.with(mContext).load(data?.data).into(imgProfilePhoto)
-                    imageURI = data?.data
-
+            val selectedImageUri = data?.data
+            selectedImageUri?.let { uri ->
+                val inputStream = contentResolver.openInputStream(uri)
+                val size = inputStream?.available()?.toLong() ?: 0
+                inputStream?.close()
+                if (size > MAX_IMAGE_SIZE_BYTES) {
+                    // Image size exceeds limit, compress it
+                    val compressedBitmap = compressImage(uri)
+                    when {
+                        UserCnicFront -> {
+                            // Set compressed image to appropriate ImageView or store it in variable
+                            imgSelectCnicFront.setImageBitmap(compressedBitmap)
+                            UserCnicFrontURI = uri
+                        }
+                        UserCnicBack -> {
+                            imgSelectCnicBack.setImageBitmap(compressedBitmap)
+                            UserCnicBackURI = uri
+                        }
+                        NomineeCnicFront -> {
+                            imgSelectCnicFront.setImageBitmap(compressedBitmap)
+                            NomineeCnicFrontURI = uri
+                        }
+                        NomineeCnicBack -> {
+                            imgSelectCnicBack.setImageBitmap(compressedBitmap)
+                            NomineeCnicBackURI = uri
+                        }
+                        UserProfilePhoto -> {
+                            Glide.with(mContext).load(uri).into(imgProfilePhoto)
+                            imageURI = uri
+                        }
+                    }
+                } else {
+                    when {
+                        UserCnicFront -> {
+                            imgSelectCnicFront.setImageURI(uri)
+                            UserCnicFrontURI = uri
+                        }
+                        UserCnicBack -> {
+                            imgSelectCnicBack.setImageURI(uri)
+                            UserCnicBackURI = uri
+                        }
+                        NomineeCnicFront -> {
+                            imgSelectCnicFront.setImageURI(uri)
+                            NomineeCnicFrontURI = uri
+                        }
+                        NomineeCnicBack -> {
+                            imgSelectCnicBack.setImageURI(uri)
+                            NomineeCnicBackURI = uri
+                        }
+                        UserProfilePhoto -> {
+                            Glide.with(mContext).load(uri).into(imgProfilePhoto)
+                            imageURI = uri
+                        }
+                    }
                 }
             }
-
-
         }
+    }
+
+    private fun compressImage(uri: Uri): Bitmap {
+        val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
+        val outputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, COMPRESSION_QUALITY, outputStream)
+        val compressedByteArray = outputStream.toByteArray()
+        return BitmapFactory.decodeByteArray(compressedByteArray, 0, compressedByteArray.size)
     }
 
 
