@@ -136,7 +136,7 @@ class ActivityNewWithdrawReq : AppCompatActivity(), InvestorAccountsAdapter.OnIt
 
                         if (jsonObject.getBoolean("success") == true) {
 
-                            Toast.makeText(mContext, "Investment Req. Sent!", Toast.LENGTH_SHORT)
+                            Toast.makeText(mContext, "WithDraw Req. Sent!", Toast.LENGTH_SHORT)
                                 .show()
                             startActivity(
                                 Intent(mContext, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK))

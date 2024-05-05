@@ -88,11 +88,11 @@ class ActivityLogin : AppCompatActivity() {
         })
 
 
-        binding.tvRegister.setOnClickListener(View.OnClickListener {
+      /*  binding.tvRegister.setOnClickListener(View.OnClickListener {
 
             startActivity(Intent(mContext, ActivitySignup::class.java))
 
-        })
+        })*/
 
 
 
